@@ -1,6 +1,5 @@
 import type { ActiveForm } from "@/types/main-interfaces";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
-import type { UserCreationDataI } from "@/schemas/user-schema";
 import AuthTabsForm from "./AuthTabsForm";
 
 export default function ActiveFormModal({ active, onClose }: 

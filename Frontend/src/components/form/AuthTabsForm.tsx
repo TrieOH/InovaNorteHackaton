@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { userCreationSchema, UserLoginDataI, userLoginSchema, type UserCreationDataI } from "@/schemas/user-schema"
+import { userCreationSchema, type UserLoginDataI, userLoginSchema, type UserCreationDataI } from "@/schemas/user-schema"
 import { DialogClose, DialogFooter } from "../ui/dialog"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
