@@ -1,4 +1,4 @@
-import PostCard from "@/components/post/PostCard";
+// import PostCard from "@/components/post/PostCard";
 
 export default function HomePage() {
   return (

@@ -9,18 +9,18 @@ export interface PostFormattedCardI {
   created_at: string;
 }
 
-// export interface PostGetI extends BasicTimestampI {
-//   id: number;
-//   user_id: string;
-//   title: string;
-//   content: string;
-// }
+export interface PostGetI extends BasicTimestampI {
+  id: number;
+  user_id: string;
+  title: string;
+  content: string;
+}
 
-// export interface CommentGetI extends BasicTimestampI {
-//   id: number;
-//   post_id: number;
-//   user_id: string;
-//   is_child_of: number;
-//   content: string;
-//   is_answer: boolean;
-// }
+export interface CommentGetI extends BasicTimestampI {
+  id: number;
+  post_id: number;
+  user_id: string;
+  is_child_of: number;
+  content: string;
+  is_answer: boolean;
+}
