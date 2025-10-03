@@ -14,6 +14,7 @@ export default function FilterDropdownMenu() {
         <DropdownMenuRadioGroup value={filter} onValueChange={setFilter}>
           <DropdownMenuRadioItem value="recents">Mais Recentes</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="relevants">Mais Relevantes</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="answered">Respondidos</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
