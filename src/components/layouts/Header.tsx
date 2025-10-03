@@ -1,5 +1,6 @@
-import { BotMessageSquare, Search } from "lucide-react";
+import { BotMessageSquare, ListFilter, Search } from "lucide-react";
 import { InputWithIcon } from "../ui/input-with-icon";
+import FilterDropdownMenu from "./FilterDropwnMenu";
 
 export function Header() {
   return (
@@ -10,9 +11,9 @@ export function Header() {
       </div>
       <div className="flex items-center gap-3">
         <InputWithIcon icon={<Search size={24}/>} className="min-w-64" placeholder="Pesquisar..."/>
+        <FilterDropdownMenu />
       </div>
       <div>
-        
       </div>
     </header>
   )
