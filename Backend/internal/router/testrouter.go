@@ -16,16 +16,23 @@ import (
 
 func CreateTestRouter(db *sql.DB) http.Handler {
 	queries := repository.New(db)
-	service := service.NewUserService(queries)
-	handler := handler.NewUserHandler(service)
+	userService := service.NewUserService(queries)
+	userHandler := handler.NewUserHandler(userService)
+	postService := service.NewPostService(queries)
+	postHandler := handler.NewPostHandler(postService)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /users", handler.CreateUser)
-	mux.HandleFunc("GET /users", handler.ListUsers)
-	mux.HandleFunc("GET /users/{user_id}", handler.GetUserByID)
-	mux.HandleFunc("GET /users/{user_id}", handler.ListUsers)
-	mux.HandleFunc("PATCH /users/{user_id}", handler.UpdateUser)
-	mux.HandleFunc("DELETE /users/{user_id}", handler.DeleteUser)
+	mux.HandleFunc("POST /users", userHandler.CreateUser)
+	mux.HandleFunc("GET /users", userHandler.ListUsers)
+	mux.HandleFunc("GET /users/{user_id}", userHandler.GetUserByID)
+	mux.HandleFunc("PATCH /users/{user_id}", userHandler.UpdateUser)
+	mux.HandleFunc("DELETE /users/{user_id}", userHandler.DeleteUser)
+
+	mux.HandleFunc("POST /posts", postHandler.CreatePost)
+	mux.HandleFunc("GET /posts", postHandler.ListPosts)
+	mux.HandleFunc("GET /posts/{post_id}", postHandler.GetPostByID)
+	mux.HandleFunc("PATCH /posts/{post_id}", postHandler.UpdatePost)
+	mux.HandleFunc("DELETE /posts/{post_id}", postHandler.DeletePost)
 
 	mux.Handle("GET /metrics", metrics.Handler())
 	withMetrics := metrics.MetricsMW(mux)

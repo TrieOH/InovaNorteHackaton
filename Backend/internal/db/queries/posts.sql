@@ -14,6 +14,7 @@ SET title = $2, content = $3, updated_at = NOW()
 WHERE id = $1
 RETURNING id, user_id, title, content, created_at, updated_at;
 
+-- name: DeletePost :exec
 DELETE FROM posts
 WHERE id = $1;
 

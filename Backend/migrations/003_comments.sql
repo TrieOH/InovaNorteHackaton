@@ -6,7 +6,7 @@ CREATE TABLE comments (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   is_child_of BIGINT REFERENCES comments(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
-  is_answer BOOL DEFAULT FALSE,
+  is_answer BOOL NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

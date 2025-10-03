@@ -49,3 +49,19 @@ type UpdateUserRequest struct {
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 }
+
+type CreatePostRequest struct {
+	UserID    string    `json:"user_id"`
+	Title     string    `json:"title"`
+	Content      string    `json:"content"`
+}
+
+type UpdatePostRequest struct {
+	UserID    string    `json:"user_id"`
+	Title     string    `json:"title"`
+	Content      string    `json:"content"`
+}
+
+type DeletePostRequest struct {
+	UserID    string    `json:"user_id"`
+}

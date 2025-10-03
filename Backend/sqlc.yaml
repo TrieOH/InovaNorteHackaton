@@ -67,3 +67,43 @@ sql:
             go_type:
               type: "bool"
               pointer: false
+          - db_type: "serial"
+            nullable: true
+            go_type:
+              type: "int"
+              pointer: true
+          - db_type: "serial"
+            nullable: false
+            go_type:
+              type: "int"
+              pointer: false
+          - db_type: "bigserial"
+            nullable: true
+            go_type:
+              type: "int64"
+              pointer: true
+          - db_type: "bigserial"
+            nullable: false
+            go_type:
+              type: "int64"
+              pointer: false
+          - db_type: "pg_catalog.int8"
+            nullable: true
+            go_type:
+              type: "int64"
+              pointer: true
+          - db_type: "pg_catalog.int8"
+            nullable: false
+            go_type:
+              type: "int64"
+              pointer: false
+          - db_type: "pg_catalog.bool"
+            nullable: true
+            go_type:
+              type: "bool"
+              pointer: true
+          - db_type: "pg_catalog.bool"
+            nullable: false
+            go_type:
+              type: "bool"
+              pointer: false
