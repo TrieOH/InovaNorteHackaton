@@ -11,7 +11,7 @@
 // }
 
 // export async function handleGetAllPosts() {
-//   const res = await api.get<PostGetI>("/posts", 
+//   const res = await api.get<PostGetI[]>("/posts", 
 //     {src: {fn: "Get Posts", route: "postActions"} }
 //   );
 // }

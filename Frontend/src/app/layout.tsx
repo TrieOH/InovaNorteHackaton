@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { Header } from "@/components/layouts/Header";
+import { ModalProvider } from "@/providers/ModalProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className={`${inter.variable} antialiased font-inter`}>
-        <Header />
-        {children}
+        <ModalProvider>
+          <Header />
+          {children}
+        </ModalProvider>
       </body>
     </html>
   );
