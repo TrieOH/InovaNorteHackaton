@@ -43,8 +43,8 @@ export default function AuthTabsForm({
 
       {/* TABS LOGIN */}
       <TabsContent value="login">
-        <form onSubmit={handleSubmitL(onSubmitLogin)}>
-          <div className="grid gap-4 py-2">
+        <form onSubmit={handleSubmitL(onSubmitLogin)} className="h-full flex flex-col">
+          <div className="grid gap-4 py-2 flex-1 content-start">
             <div className="grid gap-1">
               <Label htmlFor="username">E-mail</Label>
               <Input id="email" {...registerL("email")} aria-invalid={!!errorsL.email} />
@@ -75,8 +75,8 @@ export default function AuthTabsForm({
 
       {/* -------- TAB REGISTER -------- */}
       <TabsContent value="register">
-        <form onSubmit={handleSubmitR(onSubmitRegister)}>
-          <div className="grid gap-4 py-2">
+        <form onSubmit={handleSubmitR(onSubmitRegister)} className="h-full flex flex-col">
+          <div className="grid gap-4 py-2 flex-1 content-start">
             <div className="grid gap-1">
               <Label htmlFor="name">Nome Completo</Label>
               <Input id="name" {...registerR("name")} aria-invalid={!!errorsR.name} />

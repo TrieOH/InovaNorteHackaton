@@ -1,6 +1,7 @@
 import type { ActiveForm } from "@/types/main-interfaces";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import AuthTabsForm from "./AuthTabsForm";
+import { cn } from "@/lib/utils";
 
 export default function ActiveFormModal({ active, onClose }: 
   { active: ActiveForm; onClose: () => void }) {
@@ -8,7 +9,10 @@ export default function ActiveFormModal({ active, onClose }:
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="sm:max-w-[560px] min-h-[80%] overflow-auto max-h-[80vh] content-start">
+      <DialogContent className={cn(
+        "flex flex-col h-full",
+        "sm:max-w-[560px] min-h-[80%] overflow-auto max-h-[80vh] content-start"
+      )}>
         <DialogHeader>
           <DialogTitle>
             {active?.key === "auth-register" || active?.key === "auth-login"
