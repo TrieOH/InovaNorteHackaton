@@ -35,14 +35,14 @@ func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 
 // GetPostByID godoc
 // @Description Gets a Post
-// @Tags post
+// @Tags posts
 // @Accept json
 // @Produce json
 // @Param post_id path string true "Post ID"
 // @Success 200 {object} models.PostDTO
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /posts/{post_id} [post]
+// @Router /posts/{post_id} [get]
 func (h *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 	post, rs := h.PostService.GetPostByID(r.Context(), r.PathValue("post_id"))
 	if rs != nil {
