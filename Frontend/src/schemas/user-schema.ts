@@ -15,3 +15,18 @@ export const userCreationSchema = z.object({
 );
 
 export type UserCreationDataI = z.infer<typeof userCreationSchema>;
+
+export const userLoginSchema = z.object({
+  email: z.email({ message: "Email inválido" }),
+  password: z
+    .string()
+    .min(6, "A senha deve ter pelo menos 6 caracteres"),
+});
+
+export type UserLoginDataI = z.infer<typeof userLoginSchema>;
+
+
+// export type SignUpFormDataToSendI = Omit<
+//   SignUpFormDataI,
+//   "terms" | "confirm_password"
+// >;

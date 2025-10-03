@@ -30,7 +30,7 @@ export function Header() {
           </div>
         </Button>
         <Button 
-          onClick={() => openForm("auth")}
+          onClick={() => openForm("auth-login")}
           variant="outline" 
           className="p-0 overflow-clip pl-4 border-secondary hover:bg-secondary"
         >

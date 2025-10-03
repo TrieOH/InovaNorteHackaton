@@ -10,18 +10,15 @@ import { Label } from "../ui/label";
 
 export default function AuthFormComponent({
   mode,
-  initial,
   onSubmit,
   onCancel,
 }: {
   mode: "create" | "update";
-  initial?: Partial<UserCreationDataI>;
   onSubmit: (v: UserCreationDataI) => void;
   onCancel: () => void;
 }) {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<UserCreationDataI>({
     resolver: zodResolver(userCreationSchema),
-    defaultValues: initial as UserCreationDataI | undefined,
   });
 
   return (

@@ -7,10 +7,11 @@ export interface BasicTimestampI {
 }
 
 export type FormMode = "create" | "update";
-export type FormKey = "auth" | "post";
+export type FormKey = "auth-login" | "auth-register" | "post";
 
 export type FormDataMap = {
-  auth: UserCreationDataI;
+  "auth-register": UserCreationDataI;
+  "auth-login": UserCreationDataI;
   post: PostCreationDataI;
 };
 
