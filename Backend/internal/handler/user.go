@@ -89,7 +89,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} models.SuccessResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /users/{user_id} [patch]
+// @Router /users/{user_id} [delete]
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	rs := h.UserService.DeleteUser(r.Context(), r.PathValue("user_id"))
 	if rs != nil {
