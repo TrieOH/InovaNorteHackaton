@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,11 +10,27 @@ type CommentDTO struct {
 	ID        int64         `json:"id"`
 	PostID    int           `json:"post_id"`
 	UserID    uuid.UUID     `json:"user_id"`
-	IsChildOf sql.NullInt64 `json:"is_child_of"`
+	IsChildOf *int64 `json:"is_child_of"`
 	Content   string        `json:"content"`
-	IsAnswer  sql.NullBool  `json:"is_answer"`
+	IsAnswer  bool `json:"is_answer"`
 	CreatedAt time.Time     `json:"created_at"`
 	UpdatedAt time.Time     `json:"updated_at"`
+}
+
+type CreateCommentRequest struct {
+	UserID    string        `json:"user_id"`
+	IsChildOf *int64 `json:"is_child_of"`
+	Content   string        `json:"content"`
+}
+
+type UpdateCommentRequest struct {
+	UserID    string    `json:"user_id"`
+	Content   string        `json:"content"`
+	IsAnswer  bool `json:"is_answer"`
+}
+
+type DeleteCommentRequest struct {
+	UserID    string    `json:"user_id"`
 }
 
 type PostDTO struct {
@@ -25,6 +40,22 @@ type PostDTO struct {
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type CreatePostRequest struct {
+	UserID    string    `json:"user_id"`
+	Title     string    `json:"title"`
+	Content      string    `json:"content"`
+}
+
+type UpdatePostRequest struct {
+	UserID    string    `json:"user_id"`
+	Title     string    `json:"title"`
+	Content      string    `json:"content"`
+}
+
+type DeletePostRequest struct {
+	UserID    string    `json:"user_id"`
 }
 
 type UserDTO struct {
@@ -50,18 +81,3 @@ type UpdateUserRequest struct {
 	Password  string    `json:"password"`
 }
 
-type CreatePostRequest struct {
-	UserID    string    `json:"user_id"`
-	Title     string    `json:"title"`
-	Content      string    `json:"content"`
-}
-
-type UpdatePostRequest struct {
-	UserID    string    `json:"user_id"`
-	Title     string    `json:"title"`
-	Content      string    `json:"content"`
-}
-
-type DeletePostRequest struct {
-	UserID    string    `json:"user_id"`
-}

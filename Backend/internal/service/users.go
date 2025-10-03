@@ -44,12 +44,15 @@ func (h *UserService) UpdateUser(ctx context.Context, user_id string, req models
 	}
 
 	var newUser models.UserDTO
+	newUser.Name = req.Name
 	if req.Name == "" {
     newUser.Name = user.Name
 	}
+	newUser.Username = req.Username
 	if req.Username == "" {
     newUser.Username = user.Username
 	}
+	newUser.Email = req.Email
 	if req.Email == "" {
     newUser.Email = user.Email
 	}
