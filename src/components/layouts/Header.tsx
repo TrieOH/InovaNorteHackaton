@@ -1,11 +1,11 @@
-import { BotMessageSquare, ListFilter, LogIn, Plus, Search } from "lucide-react";
+import { BotMessageSquare, LogIn, Plus, Search } from "lucide-react";
 import { InputWithIcon } from "../ui/input-with-icon";
 import FilterDropdownMenu from "./FilterDropwnMenu";
 import { Button } from "../ui/button";
 
 export function Header() {
   return (
-    <header className="w-full flex items-center justify-between py-2 px-6 bg-background border-b-2 border-border">
+    <header className="fixed w-full flex items-center justify-between py-2 px-6 bg-background border-b-2 border-border">
       <div className="flex items-center gap-3 text-primary">
         <BotMessageSquare size={48} />
         <span className="font-bold text-2xl">MegaBot</span>
