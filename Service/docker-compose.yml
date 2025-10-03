@@ -1,6 +1,6 @@
 services:
   greet:
-    container_name: greet_service
+    container_name: inova_service
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,7 +15,7 @@ services:
 
   postgres:
     image: postgres:16
-    container_name: postgres_db
+    container_name: inova_db
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}

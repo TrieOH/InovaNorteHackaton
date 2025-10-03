@@ -11,3 +11,11 @@ type ErrorResponse struct {
 	Timestamp time.Time `json:"timestamp"`
 	Code      int       `json:"code"`
 }
+
+type SuccessResponse struct {
+	Module    string    `json:"module"`
+	Message   string    `json:"message"`
+	Trace     []string  `json:"trace"`
+	Timestamp time.Time `json:"timestamp"`
+	Code      int       `json:"code"`
+}

@@ -4,7 +4,6 @@
 package router
 
 import (
-	"log"
 	"net/http"
 
 	"GreetService/internal/handler"
@@ -17,7 +16,6 @@ import (
 	_ "GreetService/docs"
 	_ "github.com/lib/pq"
 	"github.com/rs/cors"
-	"github.com/spf13/viper"
 	"github.com/swaggo/http-swagger"
 )
 
@@ -32,25 +30,18 @@ import (
 // @BasePath  /
 func CreateRouter(db *sql.DB) http.Handler {
 	queries := repository.New(db)
-	service := service.NewGreetService(queries)
-	handler := handler.NewGreetHandler(service)
+	service := service.NewUserService(queries)
+	handler := handler.NewUserHandler(service)
 
 	mux := http.NewServeMux()
 	mux.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	mux.HandleFunc("POST /users", handler.CreateUser)
-	mux.HandleFunc("POST /greet", handler.GreetAll)
-	mux.HandleFunc("POST /greet/{id}", handler.GreetById)
-	mux.HandleFunc("GET /users", handler.GetAllUsers)
-	mux.HandleFunc("GET /users/{id}", handler.GetUserByID)
-
-	sgsu := viper.GetString("SPECIAL_GREETING_SERVICE_URL")
-	if sgsu != "" {
-		mux.HandleFunc("POST /greet/{id}/{greeting_id}", handler.SpecialGreetById)
-	} else {
-		log.Println("SPECIAL_GREETING_SERVICE_URL -> Unavailable")
-		log.Println("Not serving special greet routes")
-	}
+	mux.HandleFunc("GET /users", handler.ListUsers)
+	mux.HandleFunc("GET /users/{user_id}", handler.GetUserByID)
+	mux.HandleFunc("GET /users/{user_id}", handler.ListUsers)
+	mux.HandleFunc("PATCH /users/{user_id}", handler.UpdateUser)
+	mux.HandleFunc("DELETE /users/{user_id}", handler.DeleteUser)
 
 	mux.Handle("GET /metrics", metrics.Handler())
 	withMetrics := metrics.MetricsMW(mux)

@@ -17,25 +17,20 @@ import (
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /users [post]
-func (h *GreetHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateUserRequest
 	if rs := validation.ValidateWith(r, &req); rs != nil {
 		rs.Send(w)
 		return
 	}
 
-	user, rs := h.GreetService.CreateUser(r.Context(), req)
+	user, rs := h.UserService.CreateUser(r.Context(), req)
 	if rs != nil {
 		rs.Send(w)
 		return
 	}
 
-	if user.LastName != nil {
-		resp.Created("Created " + user.FirstName + " " + *user.LastName).WithData(user).Send(w)
-		return
-	}
-
-	resp.Created("Created " + user.FirstName).WithData(user).Send(w)
+	resp.Created("Created " + user.Username).WithData(user).Send(w)
 }
 
 // GetUserByID godoc
@@ -48,8 +43,8 @@ func (h *GreetHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
 // @Router /users/{id} [post]
-func (h *GreetHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
-	user, rs := h.GreetService.GetUserById(r.Context(), r.PathValue("id"))
+func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
+	user, rs := h.UserService.GetUserById(r.Context(), r.PathValue("id"))
 	if rs != nil {
 		rs.Send(w)
 		return
@@ -58,16 +53,63 @@ func (h *GreetHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	resp.OK().WithData(user).Send(w)
 }
 
-// GetAllUsers godoc
-// @Description Gets all users in the system
+// UpdateUser godoc
+// @Description Updates a user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param user body models.UpdateUserRequest true "User info"
+// @Param id path string true "User ID"
+// @Success 200 {object} models.UserDTO
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id} [patch]
+func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var req models.UpdateUserRequest
+	if rs := validation.ValidateWith(r, &req); rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	user, rs := h.UserService.UpdateUser(r.Context(), r.PathValue("user_id"), req)
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.Created("Updated " + user.Username).WithData(user).Send(w)
+}
+
+// DeleteUser godoc
+// @Description Delete a user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} models.SuccessResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id} [patch]
+func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	rs := h.UserService.DeleteUser(r.Context(), r.PathValue("user_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.Created("Deleted User").Send(w)
+}
+
+// ListUsers godoc
+// @Description List all users in the system
 // @Tags users
 // @Accept json
 // @Produce json
 // @Success 200 {array} models.UserDTO
 // @Failure 500 {object} models.ErrorResponse
 // @Router /users [get]
-func (h *GreetHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
-	users, rs := h.GreetService.GetAllUsers(r.Context())
+func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
+	users, rs := h.UserService.ListUsers(r.Context())
 	if rs != nil {
 		rs.Send(w)
 		return
