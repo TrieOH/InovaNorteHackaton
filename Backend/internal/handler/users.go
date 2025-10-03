@@ -33,6 +33,34 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	resp.Created("Created " + user.Username).WithData(user).Send(w)
 }
 
+// LoginUser godoc
+// @Description Logs in to the user account
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body models.LoginUserRequest true "User info"
+// @Success 201 {object} uuid.UUID
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /auth/login [post]
+func (h *UserHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
+	var req models.LoginUserRequest
+	if rs := validation.ValidateWith(r, &req); rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	user_id, rs := h.UserService.LoginUser(r.Context(), req)
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.Created().WithData(user_id).Send(w)
+}
+
+
+
 // GetUserByID godoc
 // @Description Gets a user
 // @Tags users

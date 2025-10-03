@@ -25,6 +25,7 @@ func CreateTestRouter(db *sql.DB) http.Handler {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /users", userHandler.CreateUser)
+	mux.HandleFunc("POST /auth/login", userHandler.LoginUser)
 	mux.HandleFunc("GET /users", userHandler.ListUsers)
 	mux.HandleFunc("GET /users/{user_id}", userHandler.GetUserByID)
 	mux.HandleFunc("PATCH /users/{user_id}", userHandler.UpdateUser)

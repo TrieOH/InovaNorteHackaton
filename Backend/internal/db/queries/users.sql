@@ -22,3 +22,8 @@ WHERE id = $1;
 SELECT id, email, name, username, created_at, updated_at
 FROM users
 ORDER BY created_at DESC;
+
+-- name: LoginUser :one
+SELECT id
+FROM users
+WHERE email = $1 AND password = $2;

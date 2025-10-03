@@ -28,6 +28,18 @@ func (h *UserService) CreateUser(ctx context.Context, req models.CreateUserReque
 	return &userDTO, nil
 }
 
+func (h *UserService) LoginUser(ctx context.Context, req models.LoginUserRequest) (*uuid.UUID, *resp.Response) {
+	user_id, err := h.queries.LoginUser(ctx, repository.LoginUserParams{
+		Email:  req.Email,
+		Password:  req.Password,
+	})
+	if err != nil {
+		return nil, resp.InternalServerError("failed to login user").AddTrace(err)
+	}
+
+	return &user_id, nil
+}
+
 func (h *UserService) UpdateUser(ctx context.Context, user_id string, req models.UpdateUserRequest) (*models.UserDTO, *resp.Response) {
 	if user_id == "" {
 		return nil, resp.BadRequest("id is required")
