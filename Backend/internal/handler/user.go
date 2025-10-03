@@ -38,13 +38,13 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 // @Tags users
 // @Accept json
 // @Produce json
-// @Param id path string true "User ID"
+// @Param user_id path string true "User ID"
 // @Success 200 {object} models.UserDTO
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /users/{id} [post]
+// @Router /users/{user_id} [get]
 func (h *UserHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
-	user, rs := h.UserService.GetUserById(r.Context(), r.PathValue("id"))
+	user, rs := h.UserService.GetUserById(r.Context(), r.PathValue("user_id"))
 	if rs != nil {
 		rs.Send(w)
 		return
