@@ -10,6 +10,16 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
+  {
+    rules: {
+      "@typescript-eslint/consistent-type-imports": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
+      "react/react-in-jsx-scope": "off",
+    },
+  },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [

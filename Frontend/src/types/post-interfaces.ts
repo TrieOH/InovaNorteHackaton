@@ -1,4 +1,4 @@
-import { BasicTimestampI } from "./main-interfaces";
+import type { BasicTimestampI } from "./main-interfaces";
 
 export interface PostFormattedCardI {
   id: number;
@@ -9,18 +9,24 @@ export interface PostFormattedCardI {
   created_at: string;
 }
 
-// export interface PostGetI extends BasicTimestampI {
-//   id: number;
-//   user_id: string;
-//   title: string;
-//   content: string;
-// }
+export interface PostCreateI {
+  title: string;
+  content: string;
+  user_id: string;
+}
 
-// export interface CommentGetI extends BasicTimestampI {
-//   id: number;
-//   post_id: number;
-//   user_id: string;
-//   is_child_of: number;
-//   content: string;
-//   is_answer: boolean;
-// }
+export interface PostGetI extends BasicTimestampI {
+  id: number;
+  title: string;
+  content: string;
+  user_id: string;
+}
+
+export interface CommentGetI extends BasicTimestampI {
+  id: number;
+  post_id: number;
+  user_id: string;
+  is_child_of: number;
+  content: string;
+  is_answer: boolean;
+}
