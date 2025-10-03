@@ -35,7 +35,7 @@ FROM comments
 WHERE is_child_of = $1
 ORDER BY created_at ASC;
 
--- name: ListCommentsByUser :many
+-- name: ListUserComments :many
 SELECT id, post_id, user_id, is_child_of, content, is_answer, created_at, updated_at
 FROM comments
 WHERE user_id = $1

@@ -204,3 +204,73 @@ func (h *CommentService) ListComments(ctx context.Context) ([]models.CommentDTO,
 
 	return commentsDTO, nil
 }
+
+func (h *CommentService) ListCommentsByPost(ctx context.Context, post_id string) ([]models.CommentDTO, *resp.Response) {
+	if post_id == "" {
+		return nil, resp.BadRequest("post_id is required")
+	}
+
+	postId, err := strconv.Atoi(post_id)
+	if err != nil {
+		return nil, resp.BadRequest("error converting post_id").AddTrace(err)
+	}
+
+	comments, err := h.queries.ListCommentsByPost(ctx, postId)
+	if err != nil {
+		return nil, resp.InternalServerError("failed to fetch all post comments").AddTrace(err)
+	}
+
+	var commentsDTO []models.CommentDTO
+	if err := copier.Copy(&commentsDTO, &comments); err != nil {
+		return nil, resp.InternalServerError("failed to create commentsDTO").AddTrace(err)
+	}
+
+	return commentsDTO, nil
+}
+
+func (h *CommentService) ListUserComments(ctx context.Context, user_id string) ([]models.CommentDTO, *resp.Response) {
+	if user_id == "" {
+		return nil, resp.BadRequest("user_id is required")
+	}
+
+	uuid, err := uuid.Parse(user_id)
+	if err != nil {
+		return nil, resp.BadRequest("invalid uuid").AddTrace(err)
+	}
+
+	comments, err := h.queries.ListUserComments(ctx, uuid)
+	if err != nil {
+		return nil, resp.InternalServerError("failed to fetch all user's comments").AddTrace(err)
+	}
+
+	var commentsDTO []models.CommentDTO
+	if err := copier.Copy(&commentsDTO, &comments); err != nil {
+		return nil, resp.InternalServerError("failed to create commentsDTO").AddTrace(err)
+	}
+
+	return commentsDTO, nil
+}
+
+func (h *CommentService) ListChildComments(ctx context.Context, comment_id string) ([]models.CommentDTO, *resp.Response) {
+	if comment_id == "" {
+		return nil, resp.BadRequest("comment_id is required")
+	}
+
+	var id int64
+	id, err := strconv.ParseInt(comment_id, 10, 64)
+	if err != nil {
+		return nil, resp.BadRequest("error converting comment_id").AddTrace(err)
+	}
+
+	comments, err := h.queries.ListChildComments(ctx, &id)
+	if err != nil {
+		return nil, resp.InternalServerError("failed to fetch child comments").AddTrace(err)
+	}
+
+	var commentsDTO []models.CommentDTO
+	if err := copier.Copy(&commentsDTO, &comments); err != nil {
+		return nil, resp.InternalServerError("failed to create commentsDTO").AddTrace(err)
+	}
+
+	return commentsDTO, nil
+}

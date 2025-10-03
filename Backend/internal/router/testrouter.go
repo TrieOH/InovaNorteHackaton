@@ -30,6 +30,7 @@ func CreateTestRouter(db *sql.DB) http.Handler {
 	mux.HandleFunc("PATCH /users/{user_id}", userHandler.UpdateUser)
 	mux.HandleFunc("DELETE /users/{user_id}", userHandler.DeleteUser)
 	mux.HandleFunc("GET /users/{user_id}/posts", postHandler.ListUserPosts)
+	mux.HandleFunc("GET /users/{user_id}/comments", commentsHandler.ListUserComments)
 
 	mux.HandleFunc("POST /posts", postHandler.CreatePost)
 	mux.HandleFunc("GET /posts", postHandler.ListPosts)
@@ -40,8 +41,10 @@ func CreateTestRouter(db *sql.DB) http.Handler {
 	mux.HandleFunc("POST /posts/{post_id}/comments", commentsHandler.CreateComment)
 	mux.HandleFunc("GET /comments", commentsHandler.ListComments)
 	mux.HandleFunc("GET /comments/{comment_id}", commentsHandler.GetCommentByID)
+	mux.HandleFunc("GET /comments/{comment_id}/children", commentsHandler.ListChildComments)
 	mux.HandleFunc("PATCH /posts/{post_id}/comments/{comment_id}", commentsHandler.UpdateComment)
 	mux.HandleFunc("DELETE /posts/{post_id}/comments/{comment_id}", commentsHandler.DeleteComment)
+	mux.HandleFunc("GET /posts/{post_id}/comments", commentsHandler.ListCommentsByPost)
 
 	mux.Handle("GET /metrics", metrics.Handler())
 	withMetrics := metrics.MetricsMW(mux)

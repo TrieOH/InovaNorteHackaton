@@ -127,7 +127,7 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 // ListUserPosts godoc
-// @Description List all posts in from a user
+// @Description List all posts from a user
 // @Tags posts
 // @Accept json
 // @Produce json

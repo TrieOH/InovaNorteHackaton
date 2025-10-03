@@ -128,3 +128,59 @@ func (h *CommentHandler) ListComments(w http.ResponseWriter, r *http.Request) {
 	resp.OK().WithData(comments).Send(w)
 }
 
+// ListCommentsByPost godoc
+// @Description List all comments in a post
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param post_id path string true "Post ID"
+// @Success 200 {array} models.CommentDTO
+// @Failure 500 {object} models.ErrorResponse
+// @Router /posts/{post_id}/comments [get]
+func (h *CommentHandler) ListCommentsByPost(w http.ResponseWriter, r *http.Request) {
+	comments, rs := h.CommentService.ListCommentsByPost(r.Context(), r.PathValue("post_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.OK().WithData(comments).Send(w)
+}
+
+// ListUserComments godoc
+// @Description List all user comments
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {array} models.CommentDTO
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id}/comments [get]
+func (h *CommentHandler) ListUserComments(w http.ResponseWriter, r *http.Request) {
+	comments, rs := h.CommentService.ListUserComments(r.Context(), r.PathValue("user_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.OK().WithData(comments).Send(w)
+}
+
+// ListChildComments godoc
+// @Description List all children of a specific comment
+// @Tags comments
+// @Accept json
+// @Produce json
+// @Param comment_id path string true "Comment ID"
+// @Success 200 {array} models.CommentDTO
+// @Failure 500 {object} models.ErrorResponse
+// @Router /comments/{comment_id}/children [get]
+func (h *CommentHandler) ListChildComments(w http.ResponseWriter, r *http.Request) {
+	comments, rs := h.CommentService.ListChildComments(r.Context(), r.PathValue("comment_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.OK().WithData(comments).Send(w)
+}
