@@ -36,9 +36,9 @@ export default function AuthTabsForm({
 
   return (
     <Tabs defaultValue="login" className="w-full h-full">
-      <TabsList className="grid grid-cols-2 w-full">
-        <TabsTrigger value="login">Entrar</TabsTrigger>
-        <TabsTrigger value="register">Cadastrar</TabsTrigger>
+      <TabsList className="grid grid-cols-2 w-full mb-2">
+        <TabsTrigger className="rounded-none rounded-l-lg" value="login">Entrar</TabsTrigger>
+        <TabsTrigger className="rounded-none rounded-r-lg" value="register">Cadastrar</TabsTrigger>
       </TabsList>
 
       {/* TABS LOGIN */}
