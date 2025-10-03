@@ -45,6 +45,7 @@ func CreateRouter(db *sql.DB) http.Handler {
 	mux.HandleFunc("GET /users/{user_id}", userHandler.GetUserByID)
 	mux.HandleFunc("PATCH /users/{user_id}", userHandler.UpdateUser)
 	mux.HandleFunc("DELETE /users/{user_id}", userHandler.DeleteUser)
+	mux.HandleFunc("GET /users/{user_id}/posts", postHandler.ListUserPosts)
 
 	mux.HandleFunc("POST /posts", postHandler.CreatePost)
 	mux.HandleFunc("GET /posts", postHandler.ListPosts)

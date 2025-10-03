@@ -165,3 +165,26 @@ func (h *PostService) ListPosts(ctx context.Context) ([]models.PostDTO, *resp.Re
 
 	return postsDTO, nil
 }
+
+func (h *PostService) ListUserPosts(ctx context.Context, user_id string) ([]models.PostDTO, *resp.Response) {
+	if user_id == "" {
+		return nil, resp.BadRequest("user_id is required")
+	}
+
+	uuid, err := uuid.Parse(user_id)
+	if err != nil {
+		return nil, resp.BadRequest("invalid uuid").AddTrace(err)
+	}
+
+	posts, err := h.queries.ListPostsByUser(ctx, uuid)
+	if err != nil {
+		return nil, resp.InternalServerError("failed to fetch user's posts").AddTrace(err)
+	}
+
+	var postsDTO []models.PostDTO
+	if err := copier.Copy(&postsDTO, &posts); err != nil {
+		return nil, resp.InternalServerError("failed to create postsDTO").AddTrace(err)
+	}
+
+	return postsDTO, nil
+}

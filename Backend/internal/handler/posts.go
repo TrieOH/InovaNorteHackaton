@@ -123,5 +123,25 @@ func (h *PostHandler) ListPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp.OK().WithData(posts).Send(w)
+
+}
+
+// ListUserPosts godoc
+// @Description List all posts in from a user
+// @Tags posts
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User Info"
+// @Success 200 {array} models.PostDTO
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id}/posts [get]
+func (h *PostHandler) ListUserPosts(w http.ResponseWriter, r *http.Request) {
+	posts, rs := h.PostService.ListUserPosts(r.Context(), r.PathValue("user_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.OK().WithData(posts).Send(w)
 }
 
