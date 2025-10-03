@@ -7,7 +7,7 @@ export default function FilterDropdownMenu() {
   const [filter, setFilter] = useState("recents")
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="p-1.5 bg-transparent rounded-md border border-input cursor-pointer">
+      <DropdownMenuTrigger asChild className="p-1.5 active:scale-95 rounded-md border border-input cursor-pointer">
         <ListFilter size={34} />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

@@ -1,6 +1,7 @@
-import { BotMessageSquare, ListFilter, Search } from "lucide-react";
+import { BotMessageSquare, ListFilter, LogIn, Plus, Search } from "lucide-react";
 import { InputWithIcon } from "../ui/input-with-icon";
 import FilterDropdownMenu from "./FilterDropwnMenu";
+import { Button } from "../ui/button";
 
 export function Header() {
   return (
@@ -13,7 +14,19 @@ export function Header() {
         <InputWithIcon icon={<Search size={24}/>} className="min-w-64" placeholder="Pesquisar..."/>
         <FilterDropdownMenu />
       </div>
-      <div>
+      <div className="flex items-center gap-4">
+        <Button variant="outline" className="p-0 overflow-clip pl-4">
+          Nova Postagem 
+          <div className="bg-primary h-full w-9 flex justify-center items-center ml-1">
+            <Plus className="text-background" />
+          </div>
+        </Button>
+        <Button variant="outline" className="p-0 overflow-clip pl-4 border-secondary hover:bg-secondary">
+          Entrar
+          <div className="bg-secondary h-full w-9 flex justify-center items-center ml-1">
+            <LogIn className="text-background" />
+          </div>
+        </Button>
       </div>
     </header>
   )
