@@ -11,7 +11,7 @@ export default function ActiveFormModal({ active, onClose }:
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className={cn(
         "flex flex-col h-full",
-        "sm:max-w-[560px] min-h-[80%] overflow-auto max-h-[80vh] content-start"
+        "sm:max-w-[560px] min-h-[80%] overflow-y-auto max-h-[90vh] content-start"
       )}>
         <DialogHeader>
           <DialogTitle>

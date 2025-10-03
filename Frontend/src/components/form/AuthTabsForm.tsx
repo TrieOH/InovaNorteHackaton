@@ -47,14 +47,14 @@ export default function AuthTabsForm({
           <div className="grid gap-4 py-2 flex-1 content-start">
             <div className="grid gap-1">
               <Label htmlFor="username">E-mail</Label>
-              <Input id="email" {...registerL("email")} aria-invalid={!!errorsL.email} />
+              <Input id="email" {...registerL("email")} aria-invalid={!!errorsL.email} autoComplete="email" />
               {errorsL.email && (
                 <p className="text-sm text-destructive">{String(errorsL.email.message)}</p>
               )}
             </div>
             <div className="grid gap-1">
               <Label htmlFor="password">Senha</Label>
-              <Input type="password" id="password" {...registerL("password")} aria-invalid={!!errorsL.password} />
+              <Input type="password" id="password" {...registerL("password")} aria-invalid={!!errorsL.password} autoComplete="current-password" />
               {errorsL.password && (
                 <p className="text-sm text-destructive">{String(errorsL.password.message)}</p>
               )}
@@ -79,27 +79,27 @@ export default function AuthTabsForm({
           <div className="grid gap-4 py-2 flex-1 content-start">
             <div className="grid gap-1">
               <Label htmlFor="name">Nome Completo</Label>
-              <Input id="name" {...registerR("name")} aria-invalid={!!errorsR.name} />
+              <Input id="name" {...registerR("name")} aria-invalid={!!errorsR.name} autoComplete="name"/>
               {errorsR.name && <p className="text-sm text-destructive">{String(errorsR.name.message)}</p>}
             </div>
             <div className="grid gap-1">
               <Label htmlFor="username">Username</Label>
-              <Input id="username" {...registerR("username")} aria-invalid={!!errorsR.username} />
+              <Input id="username" {...registerR("username")} aria-invalid={!!errorsR.username} autoComplete="username" />
               {errorsR.username && <p className="text-sm text-destructive">{String(errorsR.username.message)}</p>}
             </div>
             <div className="grid gap-1">
               <Label htmlFor="email">E-mail</Label>
-              <Input id="email" {...registerR("email")} aria-invalid={!!errorsR.email} />
+              <Input id="email" {...registerR("email")} aria-invalid={!!errorsR.email} autoComplete="email" />
               {errorsR.email && <p className="text-sm text-destructive">{String(errorsR.email.message)}</p>}
             </div>
             <div className="grid gap-1">
               <Label htmlFor="password">Senha</Label>
-              <Input type="password" id="password" {...registerR("password")} aria-invalid={!!errorsR.password} />
+              <Input type="password" id="password" {...registerR("password")} aria-invalid={!!errorsR.password} autoComplete="new-password" />
               {errorsR.password && <p className="text-sm text-destructive">{String(errorsR.password.message)}</p>}
             </div>
             <div className="grid gap-1">
               <Label htmlFor="confirm_password">Confirme a Senha</Label>
-              <Input type="password" id="confirm_password" {...registerR("confirm_password")} aria-invalid={!!errorsR.confirm_password} />
+              <Input type="password" id="confirm_password" {...registerR("confirm_password")} aria-invalid={!!errorsR.confirm_password} autoComplete="confirm_password" />
               {errorsR.confirm_password && (
                 <p className="text-sm text-destructive">{String(errorsR.confirm_password.message)}</p>
               )}
