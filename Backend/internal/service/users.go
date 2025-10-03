@@ -88,7 +88,7 @@ func (h *UserService) DeleteUser(ctx context.Context, user_id string) *resp.Resp
 
 	err = h.queries.DeleteUser(ctx, user.ID)
 	if err != nil {
-		return resp.InternalServerError("failed to update user").AddTrace(err)
+		return resp.InternalServerError("failed to delete user").AddTrace(err)
 	}
 
 	return nil
