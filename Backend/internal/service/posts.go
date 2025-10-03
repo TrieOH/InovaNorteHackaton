@@ -67,9 +67,11 @@ func (h *PostService) UpdatePost(ctx context.Context, post_id string, req models
 	}
 
 	var newPost models.PostDTO
+	newPost.Title = req.Title
 	if req.Title == "" {
 		newPost.Title = post.Title
 	}
+	newPost.Content = req.Content
 	if req.Content == "" {
 		newPost.Content = post.Content
 	}

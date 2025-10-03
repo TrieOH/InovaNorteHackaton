@@ -18,6 +18,11 @@ RETURNING id, post_id, user_id, is_child_of, content, is_answer, created_at, upd
 DELETE FROM comments
 WHERE id = $1;
 
+-- name: ListComments :many
+SELECT id, post_id, user_id, is_child_of, content, is_answer, created_at, updated_at
+FROM comments
+ORDER BY created_at DESC;
+
 -- name: ListCommentsByPost :many
 SELECT id, post_id, user_id, is_child_of, content, is_answer, created_at, updated_at
 FROM comments

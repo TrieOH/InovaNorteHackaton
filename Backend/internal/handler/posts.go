@@ -63,7 +63,7 @@ func (h *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} models.PostDTO
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
-// @Router /posts/{user_id} [patch]
+// @Router /posts/{post_id} [patch]
 func (h *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	var req models.UpdatePostRequest
 	if rs := validation.ValidateWith(r, &req); rs != nil {
