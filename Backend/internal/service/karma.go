@@ -111,3 +111,56 @@ func (h *KarmaService) GetCommentKarma(ctx context.Context, comment_id string) (
 	return commentKarma, nil
 }
 
+func (h *KarmaService) GetUserPostKarma(ctx context.Context, userID string) (int, *resp.Response) {
+	if userID == "" {
+		return 0, resp.BadRequest("user_id is required")
+	}
+
+	uuid, err := uuid.Parse(userID)
+	if err != nil {
+		return 0, resp.BadRequest("invalid uuid").AddTrace(err)
+	}
+
+	postKarma, err := h.queries.GetUserPostKarma(ctx, uuid)
+	if err != nil {
+		return 0, resp.InternalServerError("failed to get user post karma").AddTrace(err)
+	}
+
+	return postKarma, nil
+}
+
+func (h *KarmaService) GetUserCommentKarma(ctx context.Context, userID string) (int, *resp.Response) {
+	if userID == "" {
+		return 0, resp.BadRequest("user_id is required")
+	}
+
+	uuid, err := uuid.Parse(userID)
+	if err != nil {
+		return 0, resp.BadRequest("invalid uuid").AddTrace(err)
+	}
+
+	commentKarma, err := h.queries.GetUserCommentKarma(ctx, uuid)
+	if err != nil {
+		return 0, resp.InternalServerError("failed to get user comment karma").AddTrace(err)
+	}
+
+	return commentKarma, nil
+}
+
+func (h *KarmaService) GetUserTotalKarma(ctx context.Context, userID string) (int, *resp.Response) {
+	if userID == "" {
+		return 0, resp.BadRequest("user_id is required")
+	}
+
+	uuid, err := uuid.Parse(userID)
+	if err != nil {
+		return 0, resp.BadRequest("invalid uuid").AddTrace(err)
+	}
+
+	totalKarma, err := h.queries.GetUserTotalKarma(ctx, uuid)
+	if err != nil {
+		return 0, resp.InternalServerError("failed to get user total karma").AddTrace(err)
+	}
+
+	return totalKarma, nil
+}

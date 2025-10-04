@@ -83,6 +83,7 @@ func (h *KarmaHandler) GetPostKarma(w http.ResponseWriter, r *http.Request) {
 	resp.OK().WithData(karma).Send(w)
 
 }
+
 // GetCommentKarma godoc
 // @Description Gets the karma from a comment
 // @Tags karma
@@ -103,3 +104,62 @@ func (h *KarmaHandler) GetCommentKarma(w http.ResponseWriter, r *http.Request) {
 	resp.OK().WithData(karma).Send(w)
 }
 
+// GetUserPostKarma godoc
+// @Description Gets the total post karma for a user
+// @Tags karma
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {object} int
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id}/karma/posts [get]
+func (h *KarmaHandler) GetUserPostKarma(w http.ResponseWriter, r *http.Request) {
+	karma, rs := h.KarmaService.GetUserPostKarma(r.Context(), r.PathValue("user_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.OK().WithData(karma).Send(w)
+}
+
+// GetUserCommentKarma godoc
+// @Description Gets the total comment karma for a user
+// @Tags karma
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {object} int
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id}/karma/comments [get]
+func (h *KarmaHandler) GetUserCommentKarma(w http.ResponseWriter, r *http.Request) {
+	karma, rs := h.KarmaService.GetUserCommentKarma(r.Context(), r.PathValue("user_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.OK().WithData(karma).Send(w)
+}
+
+// GetUserTotalKarma godoc
+// @Description Gets the total karma (posts + comments) for a user
+// @Tags karma
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {object} int
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /users/{user_id}/karma [get]
+func (h *KarmaHandler) GetUserTotalKarma(w http.ResponseWriter, r *http.Request) {
+	karma, rs := h.KarmaService.GetUserTotalKarma(r.Context(), r.PathValue("user_id"))
+	if rs != nil {
+		rs.Send(w)
+		return
+	}
+
+	resp.OK().WithData(karma).Send(w)
+}

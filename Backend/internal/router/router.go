@@ -69,6 +69,9 @@ func CreateRouter(db *sql.DB) http.Handler {
 	mux.HandleFunc("POST /comments/{comment_id}/vote", karmaHandler.VoteComment)
 	mux.HandleFunc("GET /posts/{post_id}/karma", karmaHandler.GetPostKarma)
 	mux.HandleFunc("GET /comments/{comment_id}/karma", karmaHandler.GetCommentKarma)
+	mux.HandleFunc("GET /users/{user_id}/karma/posts", karmaHandler.GetUserPostKarma)
+	mux.HandleFunc("GET /users/{user_id}/karma/comments", karmaHandler.GetUserCommentKarma)
+	mux.HandleFunc("GET /users/{user_id}/karma", karmaHandler.GetUserTotalKarma)
 
 	mux.Handle("GET /metrics", metrics.Handler())
 	withMetrics := metrics.MetricsMW(mux)

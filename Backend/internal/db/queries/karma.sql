@@ -19,3 +19,18 @@ WHERE post_id = $1;
 SELECT COALESCE(SUM(vote), 0)::INT AS karma
 FROM comment_votes
 WHERE comment_id = $1;
+
+-- name: GetUserPostKarma :one
+SELECT COALESCE(post_karma, 0)::INT AS post_karma
+FROM user_post_karma
+WHERE user_id = $1;
+
+-- name: GetUserCommentKarma :one
+SELECT COALESCE(comment_karma, 0)::INT AS comment_karma
+FROM user_comment_karma
+WHERE user_id = $1;
+
+-- name: GetUserTotalKarma :one
+SELECT COALESCE(total_karma, 0)::INT AS total_karma
+FROM user_karma
+WHERE user_id = $1;
