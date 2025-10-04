@@ -1,0 +1,5 @@
+{
+  "failed to create user": "Houve uma falha ao criar o usuário",
+  "trace: pq: duplicate key value violates unique constraint \"users_username_key\"": 
+    "Já existe um usário com esse username"
+}

@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Header } from "@/components/layouts/Header";
 import { ModalProvider } from "@/providers/ModalProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,6 +28,7 @@ export default function RootLayout({
           <Header />
           {children}
         </ModalProvider>
+        <Toaster />
       </body>
     </html>
   );

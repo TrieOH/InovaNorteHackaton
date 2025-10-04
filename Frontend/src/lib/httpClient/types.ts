@@ -14,6 +14,7 @@ export type TraceInfo = {
 export type ApiResponseSuccess<T> = {
   message: string;
   data: T;
+  trace?: string[];
   timestamp: string; // ISO string
   code: number;
   module?: string; // 2xx

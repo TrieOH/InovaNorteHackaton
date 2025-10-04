@@ -2,6 +2,8 @@ import type { ActiveForm } from "@/types/main-interfaces";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import AuthTabsForm from "./AuthTabsForm";
 import { cn } from "@/lib/utils";
+import { handleCreateUser } from "@/actions/auth-actions";
+import { toast } from "sonner";
 
 export default function ActiveFormModal({ active, onClose }: 
   { active: ActiveForm; onClose: () => void }) {
@@ -32,24 +34,27 @@ export default function ActiveFormModal({ active, onClose }:
         {(active?.key === "auth-register" || active?.key === "auth-login") && (
           <AuthTabsForm
             onCancel={onClose}
-            onSubmitRegister={(values) => {
-              console.log("Auth Register submit", values, active.mode);
-              onClose();
+            onSubmitRegister={async (values) => {
+              const res = await handleCreateUser(values);
+              if(res.success) {
+                toast("Usuário cadastrado com sucesso!", {
+                  description: res.message,
+                  position: "bottom-right"
+                })
+                onClose();
+              }
+              else {
+                toast(res.error, {
+                  description: res.trace,
+                  position: "bottom-right"
+                })
+              }
             }}
             onSubmitLogin={(values) => {
               console.log("Auth Register submit", values, active.mode);
               onClose();
             }}
           />
-          // <AuthFormComponent
-          //   mode={active.mode}
-          //   initial={active.data as UserCreationDataI}
-          //   onCancel={onClose}
-          //   onSubmit={(values) => {
-          //     console.log("Auth submit", values, active.mode);
-          //     onClose();
-          //   }}
-          // />
         )}
 
         {/* {active?.key === "post" && (
