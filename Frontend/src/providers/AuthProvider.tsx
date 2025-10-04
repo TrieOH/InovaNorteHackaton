@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 
 type AuthContextType = {
   is_logged_in: boolean;
