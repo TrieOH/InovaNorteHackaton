@@ -1,8 +1,9 @@
 FROM node:22-slim AS build
 WORKDIR /app
+RUN corepack enable
 COPY package*.json ./
-RUN npm install --force
+RUN pnpm install --force
 COPY . .
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
 
 EXPOSE 3000
