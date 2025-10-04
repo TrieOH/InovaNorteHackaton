@@ -86,3 +86,12 @@ type UpdateUserRequest struct {
 	Password  string    `json:"password"`
 }
 
+type VotePostRequest struct {
+	UserID    string    `json:"user_id"`
+	Vote      int       `json:"vote"`
+}
+
+type VoteCommentRequest struct {
+	UserID    string    `json:"user_id"`
+	Vote      int       `json:"vote"`
+}

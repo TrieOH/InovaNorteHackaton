@@ -22,6 +22,8 @@ func CreateTestRouter(db *sql.DB) http.Handler {
 	postHandler := handler.NewPostHandler(postService)
 	commentsService := service.NewCommentService(queries)
 	commentsHandler := handler.NewCommentHandler(commentsService)
+	karmaService := service.NewKarmaService(queries)
+	karmaHandler := handler.NewKarmaHandler(karmaService)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /users", userHandler.CreateUser)
@@ -46,6 +48,11 @@ func CreateTestRouter(db *sql.DB) http.Handler {
 	mux.HandleFunc("PATCH /posts/{post_id}/comments/{comment_id}", commentsHandler.UpdateComment)
 	mux.HandleFunc("DELETE /posts/{post_id}/comments/{comment_id}", commentsHandler.DeleteComment)
 	mux.HandleFunc("GET /posts/{post_id}/comments", commentsHandler.ListCommentsByPost)
+
+	mux.HandleFunc("POST /posts/{post_id}/vote", karmaHandler.VotePost)
+	mux.HandleFunc("POST /comments/{comment_id}/vote", karmaHandler.VoteComment)
+	mux.HandleFunc("GET /posts/{post_id}/karma", karmaHandler.GetPostKarma)
+	mux.HandleFunc("GET /comments/{comment_id}/karma", karmaHandler.GetCommentKarma)
 
 	mux.Handle("GET /metrics", metrics.Handler())
 	withMetrics := metrics.MetricsMW(mux)
