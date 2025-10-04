@@ -9,12 +9,6 @@ export interface PostFormattedCardI {
   created_at: string;
 }
 
-export interface PostCreateI {
-  title: string;
-  content: string;
-  user_id: string;
-}
-
 export interface PostGetI extends BasicTimestampI {
   id: number;
   title: string;

@@ -3,5 +3,6 @@
   "trace: pq: duplicate key value violates unique constraint \"users_username_key\"": 
     "Já existe um usário com esse username",
   "failed to login user": "Houve uma falha ao logar o usuário",
-  "login:trace: sql: no rows in result set": "Credenciais inválidas"
+  "login:trace: sql: no rows in result set": "Credenciais inválidas",
+  "Created Post": "Postagem criada"
 }

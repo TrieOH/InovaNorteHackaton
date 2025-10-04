@@ -5,6 +5,9 @@ import { cn } from "@/lib/utils";
 import { handleCreateUser, handleLoginUser } from "@/actions/auth-actions";
 import { toast } from "sonner";
 import type { UserCreationDataI, UserLoginDataI } from "@/schemas/user-schema";
+import PostFormComponent from "./PostFormComponent";
+import type { PostCreationDataI } from "@/schemas/post-schema";
+import { handleCreatePost } from "@/actions/post-actions";
 
 export default function ActiveFormModal({ active, onClose }: 
   { active: ActiveForm; onClose: () => void }) {
@@ -31,6 +34,23 @@ export default function ActiveFormModal({ active, onClose }:
     const res = await handleCreateUser(values);
     if(res.success) {
       toast("Usuário cadastrado com sucesso!", {
+        description: res.message,
+        position: "bottom-right"
+      })
+      onClose();
+    }
+    else {
+      toast(res.error, {
+        description: res.trace,
+        position: "bottom-right"
+      })
+    }
+  }
+
+  const onSubmitCreatePost = async (values: PostCreationDataI) => {
+    const res = await handleCreatePost(values);
+    if(res.success) {
+      toast("Postagem criada com sucesso!", {
         description: res.message,
         position: "bottom-right"
       })
@@ -74,17 +94,14 @@ export default function ActiveFormModal({ active, onClose }:
           />
         )}
 
-        {/* {active?.key === "post" && (
+        {active?.key === "post" && (
           <PostFormComponent
             mode={active.mode}
-            initial={active.data}
+            initial={active.data as PostCreationDataI}
             onCancel={onClose}
-            onSubmit={(values) => {
-              console.log("Post submit", values, active.mode);
-              onClose();
-            }}
+            onSubmit={(values) => onSubmitCreatePost(values)}
           />
-        )} */}
+        )}
       </DialogContent>
     </Dialog>
   );
