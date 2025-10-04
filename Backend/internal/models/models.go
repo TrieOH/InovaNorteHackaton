@@ -74,6 +74,11 @@ type CreateUserRequest struct {
 	Password  string    `json:"password"`
 }
 
+type LoginUserRequest struct {
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+}
+
 type UpdateUserRequest struct {
 	Email     string    `json:"email"`
 	Name      string    `json:"name"`
@@ -81,3 +86,12 @@ type UpdateUserRequest struct {
 	Password  string    `json:"password"`
 }
 
+type VotePostRequest struct {
+	UserID    string    `json:"user_id"`
+	Vote      int       `json:"vote"`
+}
+
+type VoteCommentRequest struct {
+	UserID    string    `json:"user_id"`
+	Vote      int       `json:"vote"`
+}

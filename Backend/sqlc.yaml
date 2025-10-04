@@ -107,3 +107,13 @@ sql:
             go_type:
               type: "bool"
               pointer: false
+          - db_type: "pg_catalog.int2"
+            nullable: true
+            go_type:
+              type: "int"
+              pointer: true
+          - db_type: "pg_catalog.int2"
+            nullable: false
+            go_type:
+              type: "int"
+              pointer: false

@@ -27,3 +27,11 @@ type CommentService struct {
 func NewCommentService(queries *repository.Queries) *CommentService {
 	return &CommentService{queries: queries}
 }
+
+type KarmaService struct {
+	queries *repository.Queries
+}
+
+func NewKarmaService(queries *repository.Queries) *KarmaService {
+	return &KarmaService{queries: queries}
+}

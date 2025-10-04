@@ -27,7 +27,7 @@ func init() {
 		MaxInterceptorAmount: 20,
 		DefaultContentType:   "application/json",
 		EnableSizeValidation: true,
-		DefaultModule:        "greet",
+		DefaultModule:        "sicoob-service",
 	})
 
 	var err error

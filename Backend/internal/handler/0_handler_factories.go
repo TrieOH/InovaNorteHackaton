@@ -27,3 +27,11 @@ type CommentHandler struct {
 func NewCommentHandler(service *service.CommentService) *CommentHandler {
 	return &CommentHandler{CommentService: service}
 }
+
+type KarmaHandler struct {
+	KarmaService *service.KarmaService
+}
+
+func NewKarmaHandler(service *service.KarmaService) *KarmaHandler {
+	return &KarmaHandler{KarmaService: service}
+}
