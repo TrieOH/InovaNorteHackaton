@@ -1,9 +1,9 @@
-// import PostCard from "@/components/post/PostCard";
+import PostList from "@/components/post/PostList";
 
 export default function HomePage() {
   return (
-    <section className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      {/* <PostCard /> */}
+    <section className="flex justify-center mt-5">
+      <PostList />
     </section>
   );
 }

@@ -7,6 +7,7 @@ import { ModalProvider } from "@/providers/ModalProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { getAuthTokens } from "@/lib/cookies";
+import { MainContentProvider } from "@/providers/MainContentProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -14,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MegaBot",
+  title: "SiConn",
   description: "Por enquanto nada",
 };
 
@@ -28,10 +29,12 @@ export default async function RootLayout({
     <html lang="pt-br">
       <body className={`${inter.variable} antialiased font-inter`}>
         <AuthProvider is_logged_in={is_logged_in}>
-          <ModalProvider>
-            <Header />
-            {children}
-          </ModalProvider>
+          <MainContentProvider>
+            <ModalProvider>
+              <Header />
+              {children}
+            </ModalProvider>
+          </MainContentProvider>
         </AuthProvider>
         <Toaster />
       </body>

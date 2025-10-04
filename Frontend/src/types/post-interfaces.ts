@@ -1,14 +1,5 @@
 import type { BasicTimestampI } from "./main-interfaces";
 
-export interface PostFormattedCardI {
-  id: number;
-  username: string;
-  title: string;
-  content_summary_text: string;
-  comments_count: number;
-  created_at: string;
-}
-
 export interface PostGetI extends BasicTimestampI {
   id: number;
   title: string;

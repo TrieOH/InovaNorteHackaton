@@ -11,26 +11,48 @@ export type TraceInfo = {
   src?: { route?: string; fn?: string };
 };
 
-export type ApiResponseSuccess<T> = {
+type ApiMeta = {
   message: string;
-  data: T;
-  trace?: string[];
-  timestamp: string; // ISO string
-  code: number;
-  module?: string; // 2xx
+  timestamp: string; // ISO
+  code: number;      // HTTP code
+  module?: string;
 };
 
-export type ApiResponseError<T> = {
-  message: string;
+export type ApiResponseSuccess<T> = ApiMeta & {
+  ok: true;
   data: T;
-  trace?: string[];
-  timestamp: string; // ISO string
-  code: number;
-  module?: string; // 4xx
 };
 
-export type ApiResponse<T> = ApiResponseSuccess<T> | ApiResponseError<T>;
+// export type ApiResponseSuccess<T> = {
+//   message: string;
+//   data: T;
+//   trace?: string[];
+//   timestamp: string; // ISO string
+//   code: number;
+//   module?: string; // 2xx
+// };
 
+export type ApiResponseError = ApiMeta & {
+  ok: false;
+  trace?: string[]; 
+};
+
+
+// export type ApiResponseError<T> = {
+//   message: string;
+//   data: T;
+//   trace?: string[];
+//   timestamp: string; // ISO string
+//   code: number;
+//   module?: string; // 4xx
+// };
+
+export type ApiResponse<T> = ApiResponseSuccess<T> | ApiResponseError;
+
+export type NextRevalidate = {
+  revalidate?: number | false; 
+  tags?: string[];
+}
 export type RequestOptions<Body = never> = {
   method?: HttpMethod;
   params?: Record<string, string | number | boolean>;
@@ -40,7 +62,11 @@ export type RequestOptions<Body = never> = {
   retries?: number; // number of extra attempts (0 = only 1 try)
   from?: "server" | "client";
   src?: { route?: string; fn?: string };
+
+  cache?: RequestCache;                // "default" | "no-store" | ...
+  next?: NextRevalidate
 };
+
 
 export type HttpResult<T> = {
   ok: boolean;
