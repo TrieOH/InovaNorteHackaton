@@ -3,10 +3,14 @@ package service
 import (
 	"GreetService/internal/models"
 	"GreetService/internal/repository"
+	"GreetService/internal/open_router"
 	"context"
   "strconv"
+	"log"
+	"sync"
 	resp "github.com/MintzyG/GoResponse/response"
 	"github.com/google/uuid"
+	"github.com/spf13/viper"
 	"github.com/jinzhu/copier"
 )
 
@@ -15,13 +19,13 @@ func (h *PostService) CreatePost(ctx context.Context, req models.CreatePostReque
 		return nil, resp.BadRequest("user_id is required")
 	}
 
-	uuid, err := uuid.Parse(req.UserID)
+	uid, err := uuid.Parse(req.UserID)
 	if err != nil {
 		return nil, resp.BadRequest("invalid uuid").AddTrace(err)
 	}
 
 	dbPost, err := h.queries.CreatePost(ctx, repository.CreatePostParams{
-		UserID: uuid,
+		UserID: uid,
 		Title: req.Title,
 		Content:  req.Content,
 	})
@@ -34,6 +38,58 @@ func (h *PostService) CreatePost(ctx context.Context, req models.CreatePostReque
 	if err := copier.Copy(&postDTO, &dbPost); err != nil {
 		return nil, resp.InternalServerError("failed to create postDTO").AddTrace(err)
 	}
+
+	var AiAnswer string
+	user, err := h.queries.GetUserByID(ctx, uid)
+
+	go func() {
+		bgCtx := context.Background()
+
+		// Step 1: Get AI answer (and wait for it)
+		var wg sync.WaitGroup
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+			if err != nil {
+				open_router.AiComment("", dbPost.Title, dbPost.Content, &AiAnswer)
+			} else {
+				open_router.AiComment(user.Name, dbPost.Title, dbPost.Content, &AiAnswer)
+			}
+		}()
+
+		// Wait for AI to finish generating the answer
+		wg.Wait()
+
+		// Step 2: Bot ID setup
+		botIDStr := viper.GetString("BOT_USER_ID")
+		if botIDStr == "" {
+			log.Println("BOT_USER_ID not set")
+			return
+		}
+
+		botID, err := uuid.Parse(botIDStr)
+		if err != nil {
+			log.Println("Couldn't parse bot user id:", err)
+			return
+		}
+
+		// Step 3: Create comment using the AI answer
+		c, err := h.queries.CreateComment(bgCtx, repository.CreateCommentParams{
+			UserID:    botID,
+			PostID:    dbPost.ID,
+			IsChildOf: nil,
+			IsAnswer:  false,
+			Content:   AiAnswer,
+		})
+
+		if err != nil {
+			log.Println("Error creating comment from AI:", err)
+			return
+		}
+
+		log.Printf("Created bot comment:\n#%+v", c)
+	}()
 
 	return &postDTO, nil
 }

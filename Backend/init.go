@@ -2,10 +2,12 @@ package main
 
 import (
 	database "GreetService/internal/db"
+	"GreetService/internal/open_router"
 	"database/sql"
 	resp "github.com/MintzyG/GoResponse/response"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
+	openrouter "github.com/revrost/go-openrouter"
 	"log"
 	"time"
 )
@@ -29,6 +31,12 @@ func init() {
 		EnableSizeValidation: true,
 		DefaultModule:        "sicoob-service",
 	})
+
+	open_router.Client = openrouter.NewClient(
+		viper.GetString("OPENROUTER_APIKEY"),
+		openrouter.WithXTitle("SiConn"),
+		openrouter.WithHTTPReferer("https://sctiuenf.com.br"),
+	)
 
 	var err error
 	Db, err = database.WaitForDB(30 * time.Second)

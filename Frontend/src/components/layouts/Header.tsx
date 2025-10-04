@@ -23,10 +23,10 @@ export function Header() {
     });
   }
   return (
-    <header className="fixed w-full flex items-center justify-between py-2 px-6 bg-background border-b-2 border-border">
+    <header className="fixed z-10 top-0 left-0 w-full flex items-center justify-between py-2 px-6 bg-background border-b-2 border-border">
       <div className="flex items-center gap-3 text-primary">
         <BotMessageSquare size={48} />
-        <span className="font-bold text-2xl">MegaBot</span>
+        <span className="font-bold text-2xl">SiConn</span>
       </div>
       <div className="flex items-center gap-3">
         <InputWithIcon icon={<Search size={24}/>} className="min-w-64" placeholder="Pesquisar..."/>

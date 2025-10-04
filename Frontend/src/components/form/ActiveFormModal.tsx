@@ -7,11 +7,12 @@ import { toast } from "sonner";
 import type { UserCreationDataI, UserLoginDataI } from "@/schemas/user-schema";
 import PostFormComponent from "./PostFormComponent";
 import type { PostCreationDataI } from "@/schemas/post-schema";
-import { handleCreatePost } from "@/actions/post-actions";
+import { useMainContent } from "@/providers/MainContentProvider";
 
 export default function ActiveFormModal({ active, onClose }: 
   { active: ActiveForm; onClose: () => void }) {
   const open = Boolean(active);
+  const { createPost } = useMainContent();
 
   const onSubmitLogin = async (values: UserLoginDataI) => {
     const res = await handleLoginUser(values);
@@ -48,7 +49,8 @@ export default function ActiveFormModal({ active, onClose }:
   }
 
   const onSubmitCreatePost = async (values: PostCreationDataI) => {
-    const res = await handleCreatePost(values);
+    // const res = await handleCreatePost(values);
+    const res = await createPost(values);
     if(res.success) {
       toast("Postagem criada com sucesso!", {
         description: res.message,

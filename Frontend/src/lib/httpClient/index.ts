@@ -2,7 +2,9 @@ import { buildUrl, sleep } from "./helper";
 import type {
   ApiResponse,
   ApiResponseError,
+  ApiResponseSuccess,
   HttpResult,
+  NextRevalidate,
   RequestOptions,
   TraceInfo,
 } from "./types";
@@ -76,11 +78,13 @@ export class HttpClient {
       const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
       try {
-        const init: RequestInit = {
+        const init: RequestInit & NextRevalidate = {
           method,
           headers,
           signal: controller.signal,
         };
+        if(typeof opts.cache !== "undefined") init.cache = opts.cache;
+        if(opts.next) init.next = {...opts.next};
         if (
           method !== "GET" &&
           method !== "DELETE" &&
@@ -93,50 +97,72 @@ export class HttpClient {
         }
 
         const res = await fetch(url, init);
-        let parsed = (await res.json()) as ApiResponse<TData>;
-        if (!parsed) {
-          parsed = {
-            message: "Invalid JSON",
-            timestamp: new Date().toISOString(),
-            code: res.status,
-          } as ApiResponseError<TData>;
+        let parsed: ApiResponse<TData> | null = null;
+        try {
+          parsed = (await res.json()) as ApiResponse<TData>;
+        } catch {
+          parsed = null;
         }
 
         clearTimeout(timeout);
         traceBase.endedAt = Date.now();
         traceBase.durationMs = traceBase.endedAt - traceBase.startedAt;
 
-        const okHttp = res.status >= 200 && res.status < 300;
-        const appOk =
-          "code" in parsed &&
-          parsed.code >= 200 &&
-          parsed.code < 300 &&
-          "data" in parsed;
-
-        if (okHttp && appOk && "data" in parsed) {
+        if (!parsed) {
+          const fallback: ApiResponseError = {
+            ok: false,
+            message: "Invalid JSON",
+            timestamp: new Date().toISOString(),
+            code: res.status,
+          };
           return {
-            ok: true,
+            ok: false,
             status: res.status,
-            body: parsed,
+            body: fallback,
+            error: fallback.message,
             trace: { ...traceBase },
           };
         }
 
-        lastError = parsed.message ?? `HTTP ${res.status}`;
+        const httpOk = res.status >= 200 && res.status < 300;
+
+        const normalized: ApiResponse<TData> = httpOk
+          ? ({
+              // propagamos o resto:
+              ...(parsed as ApiResponseSuccess<TData>),
+              ok: true,
+            } as ApiResponseSuccess<TData>)
+          : ({
+              ...(parsed as ApiResponseError),
+              ok: false,
+              message: parsed.message || `HTTP ${res.status}`,
+              code: parsed.code ?? res.status,
+            } as ApiResponseError
+          );
+        
+        if(httpOk) {
+          return {
+            ok: true,
+            status: res.status,
+            body: normalized,
+            trace: {...traceBase}
+          };
+        }
+        lastError = (normalized as ApiResponseError).message ?? `HTTP ${res.status}`;
+        
         // retry on 5xx
         if (res.status >= 500 && attempt <= retries) {
           await sleep(100 * attempt);
           continue;
         }
 
-        const result: HttpResult<TData> = {
+        return {
           ok: false,
           status: res.status,
-          body: parsed,
+          body: normalized,
           error: lastError,
           trace: { ...traceBase },
         };
-        return result;
       } catch (err) {
         clearTimeout(timeout);
 
@@ -156,18 +182,34 @@ export class HttpClient {
         traceBase.endedAt = Date.now();
         traceBase.durationMs = traceBase.endedAt - traceBase.startedAt;
 
+        const networkError: ApiResponseError = {
+          ok: false,
+          message: lastError,
+          timestamp: new Date().toISOString(),
+          code: 500,
+          trace: [lastError],
+        };
         return {
           ok: false,
           status: 500,
+          body: networkError,
           error: lastError,
           trace: { ...traceBase },
         };
       }
     }
 
+    const fallback: ApiResponseError = {
+      ok: false,
+      message: lastError,
+      timestamp: new Date().toISOString(),
+      code: 500,
+    };
+
     return {
       ok: false,
       status: 500,
+      body: fallback,
       error: lastError,
       trace: { ...traceBase },
     };
