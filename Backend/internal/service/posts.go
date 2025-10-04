@@ -45,7 +45,6 @@ func (h *PostService) CreatePost(ctx context.Context, req models.CreatePostReque
 	go func() {
 		bgCtx := context.Background()
 
-		// Step 1: Get AI answer (and wait for it)
 		var wg sync.WaitGroup
 		wg.Add(1)
 
@@ -54,14 +53,12 @@ func (h *PostService) CreatePost(ctx context.Context, req models.CreatePostReque
 			if err != nil {
 				open_router.AiComment("", dbPost.Title, dbPost.Content, &AiAnswer)
 			} else {
-				open_router.AiComment(user.Name, dbPost.Title, dbPost.Content, &AiAnswer)
+				open_router.AiComment(user.Username, dbPost.Title, dbPost.Content, &AiAnswer)
 			}
 		}()
 
-		// Wait for AI to finish generating the answer
 		wg.Wait()
 
-		// Step 2: Bot ID setup
 		botIDStr := viper.GetString("BOT_USER_ID")
 		if botIDStr == "" {
 			log.Println("BOT_USER_ID not set")
@@ -74,7 +71,6 @@ func (h *PostService) CreatePost(ctx context.Context, req models.CreatePostReque
 			return
 		}
 
-		// Step 3: Create comment using the AI answer
 		c, err := h.queries.CreateComment(bgCtx, repository.CreateCommentParams{
 			UserID:    botID,
 			PostID:    dbPost.ID,
@@ -88,7 +84,7 @@ func (h *PostService) CreatePost(ctx context.Context, req models.CreatePostReque
 			return
 		}
 
-		log.Printf("Created bot comment:\n#%+v", c)
+		log.Printf("Created bot comment ID:#%+v\n", c.ID)
 	}()
 
 	return &postDTO, nil
