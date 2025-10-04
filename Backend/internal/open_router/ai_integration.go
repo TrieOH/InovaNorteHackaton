@@ -2,13 +2,14 @@ package open_router
 
 import (
 	"context"
-	"fmt"
+	"log"
 	openrouter "github.com/revrost/go-openrouter"
 )
 
 var Client *openrouter.Client
 
 func AiComment(name, title, content string, Comment *string) {
+	log.Println("Asking the AI for a comment")
 	var message string
 	if name != "" {
 		message = "Você é um ajudante da empresa Sicoob, uma empresa de linha de crédito, está é uma plataforma de perguntas e respostas para educação financeira e comunidade, seja o de mais ajuda possível no seu comentário e tente sanar as duvidas dos usuários, não fuja dessa ordem, apenas fale em português, tente que sua resposta não seja muito pequena, você está falando com o usuário de nome: " + name + " abra sua mensagem com um comprimento legal, não ofereça ajuda continua, tente resolver a duvida em uma mensagem só e finalize com algo similar a espero que tenha ajudado, não se coloque a disposição essa é pra ser a primeira e ultima mensagem da sua interação com essa pessoa"
@@ -35,9 +36,9 @@ func AiComment(name, title, content string, Comment *string) {
 	)
 
 	if err != nil {
-		fmt.Println("error", err)
+		log.Println("error", err)
 	} else {
 		*Comment = resp.Choices[0].Message.Content.Text
-		fmt.Printf("%#v\n", resp.Choices[0].Message.Content.Text)
+		log.Printf("%v\n", resp.Choices[0].Message.Content.Text)
 	}
 }
