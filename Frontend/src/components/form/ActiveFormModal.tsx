@@ -2,12 +2,47 @@ import type { ActiveForm } from "@/types/main-interfaces";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 import AuthTabsForm from "./AuthTabsForm";
 import { cn } from "@/lib/utils";
-import { handleCreateUser } from "@/actions/auth-actions";
+import { handleCreateUser, handleLoginUser } from "@/actions/auth-actions";
 import { toast } from "sonner";
+import type { UserCreationDataI, UserLoginDataI } from "@/schemas/user-schema";
 
 export default function ActiveFormModal({ active, onClose }: 
   { active: ActiveForm; onClose: () => void }) {
   const open = Boolean(active);
+
+  const onSubmitLogin = async (values: UserLoginDataI) => {
+    const res = await handleLoginUser(values);
+    if(res.success) {
+      toast("Usuário logado com sucesso!", {
+        description: res.message,
+        position: "bottom-right"
+      })
+      onClose();
+    }
+    else {
+      toast(res.error, {
+        description: res.trace,
+        position: "bottom-right"
+      })
+    }
+  }
+
+  const onSubmitRegister = async (values: UserCreationDataI) => {
+    const res = await handleCreateUser(values);
+    if(res.success) {
+      toast("Usuário cadastrado com sucesso!", {
+        description: res.message,
+        position: "bottom-right"
+      })
+      onClose();
+    }
+    else {
+      toast(res.error, {
+        description: res.trace,
+        position: "bottom-right"
+      })
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
@@ -34,26 +69,8 @@ export default function ActiveFormModal({ active, onClose }:
         {(active?.key === "auth-register" || active?.key === "auth-login") && (
           <AuthTabsForm
             onCancel={onClose}
-            onSubmitRegister={async (values) => {
-              const res = await handleCreateUser(values);
-              if(res.success) {
-                toast("Usuário cadastrado com sucesso!", {
-                  description: res.message,
-                  position: "bottom-right"
-                })
-                onClose();
-              }
-              else {
-                toast(res.error, {
-                  description: res.trace,
-                  position: "bottom-right"
-                })
-              }
-            }}
-            onSubmitLogin={(values) => {
-              console.log("Auth Register submit", values, active.mode);
-              onClose();
-            }}
+            onSubmitRegister={values => onSubmitRegister(values)}
+            onSubmitLogin={values => onSubmitLogin(values) }
           />
         )}
 

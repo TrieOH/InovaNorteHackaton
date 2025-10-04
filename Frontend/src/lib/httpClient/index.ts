@@ -99,7 +99,7 @@ export class HttpClient {
             message: "Invalid JSON",
             timestamp: new Date().toISOString(),
             code: res.status,
-          } as ApiResponseError;
+          } as ApiResponseError<TData>;
         }
 
         clearTimeout(timeout);

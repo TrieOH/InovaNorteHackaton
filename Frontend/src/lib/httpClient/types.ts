@@ -20,15 +20,16 @@ export type ApiResponseSuccess<T> = {
   module?: string; // 2xx
 };
 
-export type ApiResponseError = {
+export type ApiResponseError<T> = {
   message: string;
+  data: T;
   trace?: string[];
   timestamp: string; // ISO string
   code: number;
   module?: string; // 4xx
 };
 
-export type ApiResponse<T> = ApiResponseSuccess<T> | ApiResponseError;
+export type ApiResponse<T> = ApiResponseSuccess<T> | ApiResponseError<T>;
 
 export type RequestOptions<Body = never> = {
   method?: HttpMethod;
