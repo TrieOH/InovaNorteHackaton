@@ -20,6 +20,8 @@ export function ModalProvider({ children }: { children: ReactNode }) {
 
   function closeForm() {
     setActive(null);
+    setPostId(null);
+    setCommentId(null);
   }
 
   return (

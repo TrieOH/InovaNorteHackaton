@@ -6,6 +6,7 @@
 :root {
   --primary: oklch(0.5404 0.2388 281.57);
   --secondary: oklch(0.5697 0.2046 31.05);
+  --tertiary: oklch(0.6083 0.1694 140.79);
   --border: oklch(0.922 0 0);
   --background: oklch(1 0 0);
   --input: oklch(0.922 0 0);
@@ -44,6 +45,8 @@
   --font-inter: var(--font-inter);
 
   --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
   --color-border: var(--border);
   --color-background: var(--background);
   --color-input: var(--input);
@@ -72,7 +75,6 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);

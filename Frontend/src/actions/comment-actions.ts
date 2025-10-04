@@ -10,7 +10,7 @@ import { revalidateTag } from "next/cache";
 export async function handleCreateCommentOnPost(content: string, post_id: number, comment_id: number | null) {
   const id = (await getAuthTokens()).accessToken ?? "";
   const res = await api.post<CommentGetI, CommentCreationDataI & { user_id: string, is_child_of: number | null }>
-  (`/posts/${post_id}`, 
+  (`/posts/${post_id}/comments`, 
     {
       content: content,
       user_id: id,

@@ -8,7 +8,7 @@ export const postCreationSchema = z.object({
 export type PostCreationDataI = z.infer<typeof postCreationSchema>;
 
 export const commentCreationSchema = z.object({
-  content: z.string().min(20, "O Conteúdo deve ter pelo menos 10 caracteres"),
+  content: z.string().min(8, "O Conteúdo deve ter pelo menos 8 caracteres"),
 });
 
 export type CommentCreationDataI = z.infer<typeof commentCreationSchema>;

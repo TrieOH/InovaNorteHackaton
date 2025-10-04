@@ -14,7 +14,7 @@ import { useModal } from "@/providers/ModalProvider";
 export default function ActiveFormModal({ active, onClose }: 
   { active: ActiveForm; onClose: () => void }) {
   const open = Boolean(active);
-  const { postId, commentId } = useModal();
+  const { commentId, postId } = useModal();
   const { createPost, createCommentOnPost } = useMainContent();
 
   const onSubmitLogin = async (values: UserLoginDataI) => {
@@ -68,8 +68,9 @@ export default function ActiveFormModal({ active, onClose }:
     }
   }
 
-  const onSubmitCreateComment = async (values: CommentCreationDataI, comment_id: number | null, post_id: number) => {
-    const res = await createCommentOnPost({...values, comment_id: comment_id, post_id: post_id});
+  const onSubmitCreateComment = async (values: CommentCreationDataI) => {
+    if(postId.value === null) return;
+    const res = await createCommentOnPost({...values, comment_id: commentId.value, post_id: postId.value});
     if(res.success) {
       toast("Comentário criado com sucesso!", {
         description: res.message,
@@ -95,14 +96,14 @@ export default function ActiveFormModal({ active, onClose }:
           <DialogTitle>
             {active?.key === "auth-register" || active?.key === "auth-login"
               ? "Bem vindo" 
-              : active?.key === "post"
+              : (active?.key === "post" || active?.key === "comment")
               ? "Compartilhe seus conhecimentos"
               : ""}
           </DialogTitle>
           <DialogDescription>
             {active?.key === "auth-register" || active?.key === "auth-login"
               ? "Crie ou entre em sua conta para participar das discussões." 
-              : active?.key === "post" ? "Oque quer escrever hoje?"
+              : (active?.key === "post" || active?.key === "comment") ? "Oque quer escrever hoje?"
               : ""}
           </DialogDescription>
         </DialogHeader>
@@ -110,8 +111,8 @@ export default function ActiveFormModal({ active, onClose }:
         {(active?.key === "auth-register" || active?.key === "auth-login") && (
           <AuthTabsForm
             onCancel={onClose}
-            onSubmitRegister={values => onSubmitRegister(values)}
-            onSubmitLogin={values => onSubmitLogin(values) }
+            onSubmitRegister={onSubmitRegister}
+            onSubmitLogin={onSubmitLogin}
           />
         )}
 
@@ -120,7 +121,7 @@ export default function ActiveFormModal({ active, onClose }:
             mode={active.mode}
             initial={active.data as PostCreationDataI}
             onCancel={onClose}
-            onSubmit={(values) => onSubmitCreatePost(values)}
+            onSubmit={onSubmitCreatePost}
           />
         )}
 
@@ -129,7 +130,7 @@ export default function ActiveFormModal({ active, onClose }:
             mode={active.mode}
             initial={active.data as CommentCreationDataI}
             onCancel={onClose}
-            onSubmit={(values) => postId.value && onSubmitCreateComment(values, commentId.value, postId.value)}
+            onSubmit={onSubmitCreateComment}
           />
         )}
       </DialogContent>
