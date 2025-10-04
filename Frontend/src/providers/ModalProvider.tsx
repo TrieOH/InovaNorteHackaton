@@ -7,6 +7,8 @@ const ModalContext = createContext<ModalContextValue | undefined>(undefined);
 
 export function ModalProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState<ActiveForm>(null);
+  const [postId, setPostId] = useState<number | null>(null);
+  const [commentId, setCommentId] = useState<number | null>(null);
 
   function openForm<K extends FormKey>(
     key: K,
@@ -21,7 +23,14 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ModalContext.Provider value={{ openForm, closeForm }}>
+    <ModalContext.Provider 
+      value={{ 
+        openForm, 
+        closeForm, 
+        postId:{value: postId, setValue: setPostId},
+        commentId:{value: commentId, setValue: setCommentId}
+      }}
+    >
       {children}
       <ActiveFormModal active={active} onClose={closeForm} />
     </ModalContext.Provider>

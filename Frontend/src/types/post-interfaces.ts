@@ -11,7 +11,7 @@ export interface CommentGetI extends BasicTimestampI {
   id: number;
   post_id: number;
   user_id: string;
-  is_child_of: number;
+  is_child_of: number | null;
   content: string;
   is_answer: boolean;
 }

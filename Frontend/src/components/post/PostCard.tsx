@@ -1,16 +1,22 @@
+"use client";
 import { timeAgo } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import { useMainContent } from "@/providers/MainContentProvider";
 import type { PostGetI } from "@/types/post-interfaces";
 import { MessageSquare, Share2 } from "lucide-react";
+import { useEffect } from "react";
 
 interface PostI {
   data: PostGetI
 }
 
 export default function PostCard(props: PostI) {
-  const { getUserById } = useMainContent();
+  const { getUserById, getAllCommentsFromPost, getCommentsForPost } = useMainContent();
   const user = getUserById(props.data.user_id);
+
+  useEffect(() => { getAllCommentsFromPost(props.data.id); }, [props.data.id, getAllCommentsFromPost]);
+  const comments = getCommentsForPost(props.data.id);
+
   if(!user) return;
   return (
     <div className={cn(
@@ -34,7 +40,7 @@ export default function PostCard(props: PostI) {
         <div className="flex w-full items-center justify-between">
           <div className="flex gap-1.5">
             <MessageSquare />
-            <span>{0}</span>
+            <span>{comments.length}</span>
           </div>
           <Share2 />
         </div>

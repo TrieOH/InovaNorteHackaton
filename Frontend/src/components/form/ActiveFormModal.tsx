@@ -6,13 +6,16 @@ import { handleCreateUser, handleLoginUser } from "@/actions/auth-actions";
 import { toast } from "sonner";
 import type { UserCreationDataI, UserLoginDataI } from "@/schemas/user-schema";
 import PostFormComponent from "./PostFormComponent";
-import type { PostCreationDataI } from "@/schemas/post-schema";
+import type { CommentCreationDataI, PostCreationDataI } from "@/schemas/post-schema";
 import { useMainContent } from "@/providers/MainContentProvider";
+import PostCommentFormComponent from "./PostCommentFormComponent";
+import { useModal } from "@/providers/ModalProvider";
 
 export default function ActiveFormModal({ active, onClose }: 
   { active: ActiveForm; onClose: () => void }) {
   const open = Boolean(active);
-  const { createPost } = useMainContent();
+  const { postId, commentId } = useModal();
+  const { createPost, createCommentOnPost } = useMainContent();
 
   const onSubmitLogin = async (values: UserLoginDataI) => {
     const res = await handleLoginUser(values);
@@ -49,10 +52,26 @@ export default function ActiveFormModal({ active, onClose }:
   }
 
   const onSubmitCreatePost = async (values: PostCreationDataI) => {
-    // const res = await handleCreatePost(values);
     const res = await createPost(values);
     if(res.success) {
       toast("Postagem criada com sucesso!", {
+        description: res.message,
+        position: "bottom-right"
+      })
+      onClose();
+    }
+    else {
+      toast(res.error, {
+        description: res.trace,
+        position: "bottom-right"
+      })
+    }
+  }
+
+  const onSubmitCreateComment = async (values: CommentCreationDataI, comment_id: number | null, post_id: number) => {
+    const res = await createCommentOnPost({...values, comment_id: comment_id, post_id: post_id});
+    if(res.success) {
+      toast("Comentário criado com sucesso!", {
         description: res.message,
         position: "bottom-right"
       })
@@ -102,6 +121,15 @@ export default function ActiveFormModal({ active, onClose }:
             initial={active.data as PostCreationDataI}
             onCancel={onClose}
             onSubmit={(values) => onSubmitCreatePost(values)}
+          />
+        )}
+
+        {active?.key === "comment" && (
+          <PostCommentFormComponent
+            mode={active.mode}
+            initial={active.data as CommentCreationDataI}
+            onCancel={onClose}
+            onSubmit={(values) => postId.value && onSubmitCreateComment(values, commentId.value, postId.value)}
           />
         )}
       </DialogContent>

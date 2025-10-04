@@ -1,8 +1,9 @@
 "use client";
 import { handleGetAllUsers, handleGetUserByID } from "@/actions/auth-actions";
+import { handleCreateCommentOnPost, handleGetAllComentsChildren, handleGetAllComentsFromPost } from "@/actions/comment-actions";
 import { handleCreatePost, handleGetAllPosts, handleGetPostByID } from "@/actions/post-actions";
 import type { PostCreationDataI } from "@/schemas/post-schema";
-import type { PostGetI } from "@/types/post-interfaces";
+import type { CommentGetI, PostGetI } from "@/types/post-interfaces";
 import type { UserGetI } from "@/types/user-interfaces";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useReducer, useRef } from "react";
 
@@ -12,6 +13,15 @@ type State = {
   usersById: Record<string, UserGetI>;
   loaded: { users: boolean; posts: boolean };
   loading: { users: boolean; posts: boolean };
+
+  // Comments
+  commentsById: Record<number, CommentGetI>;
+  commentsByPostId: Record<number, number[]>;
+  commentsChildrenById: Record<number, number[]>;
+    loadedCommentsForPost: Record<number, boolean>;
+  loadingCommentsForPost: Record<number, boolean>;
+  loadedChildrenForComment: Record<number, boolean>;
+  loadingChildrenForComment: Record<number, boolean>;
 };
 
 const initialState: State = {
@@ -20,6 +30,14 @@ const initialState: State = {
   usersById: {},
   loaded: { users: false, posts: false },
   loading: { users: false, posts: false },
+
+  commentsById: {},
+  commentsByPostId: {},
+  commentsChildrenById: {},
+  loadedCommentsForPost: {},
+  loadingCommentsForPost: {},
+  loadedChildrenForComment: {},
+  loadingChildrenForComment: {},
 };
 
 type Action =
@@ -28,7 +46,16 @@ type Action =
   | { type: 'UPSERT_USER'; user: UserGetI }
   | { type: 'UPSERT_POST'; post: PostGetI }
   | { type: "SET_LOADING"; key: keyof State["loading"]; value: boolean }
-  | { type: "SET_LOADED"; key: keyof State["loaded"]; value: boolean };
+  | { type: "SET_LOADED"; key: keyof State["loaded"]; value: boolean }
+
+    // Comments
+  | { type: "UPSERT_COMMENTS_FOR_POST"; postId: number; comments: CommentGetI[] }
+  | { type: "UPSERT_CHILDREN_FOR_COMMENT"; commentId: number; children: CommentGetI[] }
+  | { type: "UPSERT_COMMENT"; comment: CommentGetI }
+  | { type: "SET_LOADING_COMMENTS_FOR_POST"; postId: number; value: boolean }
+  | { type: "SET_LOADED_COMMENTS_FOR_POST"; postId: number; value: boolean }
+  | { type: "SET_LOADING_CHILDREN_FOR_COMMENT"; commentId: number; value: boolean }
+  | { type: "SET_LOADED_CHILDREN_FOR_COMMENT"; commentId: number; value: boolean };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -61,6 +88,68 @@ function reducer(state: State, action: Action): State {
       return { ...state, loading: { ...state.loading, [action.key]: action.value } };
     case "SET_LOADED":
       return { ...state, loaded: { ...state.loaded, [action.key]: action.value } };
+    
+    // Comments
+        case "UPSERT_COMMENTS_FOR_POST": {
+      const commentsById = { ...state.commentsById };
+      const rootIds = new Set<number>(state.commentsByPostId[action.postId] ?? []);
+      const childrenMap = { ...state.commentsChildrenById };
+
+      for (const c of action.comments) {
+        commentsById[c.id] = c;
+        if (c.is_child_of == null) {
+          rootIds.add(c.id);
+        } else {
+          const arr = new Set<number>(childrenMap[c.is_child_of] ?? []);
+          arr.add(c.id);
+          childrenMap[c.is_child_of] = Array.from(arr);
+        }
+      }
+      return {
+        ...state,
+        commentsById,
+        commentsChildrenById: childrenMap,
+        commentsByPostId: { ...state.commentsByPostId, [action.postId]: Array.from(rootIds) },
+      };
+    }
+    case "UPSERT_CHILDREN_FOR_COMMENT": {
+      const commentsById = { ...state.commentsById };
+      const childIds = new Set<number>(state.commentsChildrenById[action.commentId] ?? []);
+      for (const c of action.children) {
+        commentsById[c.id] = c;
+        childIds.add(c.id);
+      }
+      return {
+        ...state,
+        commentsById,
+        commentsChildrenById: { ...state.commentsChildrenById, [action.commentId]: Array.from(childIds) },
+      };
+    }
+    case "UPSERT_COMMENT": {
+      const c = action.comment;
+      const commentsById = { ...state.commentsById, [c.id]: c };
+      const commentsByPostId = { ...state.commentsByPostId };
+      const commentsChildrenById = { ...state.commentsChildrenById };
+      if (c.is_child_of == null) {
+        const roots = new Set<number>(commentsByPostId[c.post_id] ?? []);
+        roots.add(c.id);
+        commentsByPostId[c.post_id] = Array.from(roots);
+      } else {
+        const children = new Set<number>(commentsChildrenById[c.is_child_of] ?? []);
+        children.add(c.id);
+        commentsChildrenById[c.is_child_of] = Array.from(children);
+      }
+      return { ...state, commentsById, commentsByPostId, commentsChildrenById };
+    }
+    case "SET_LOADING_COMMENTS_FOR_POST":
+      return { ...state, loadingCommentsForPost: { ...state.loadingCommentsForPost, [action.postId]: action.value } };
+    case "SET_LOADED_COMMENTS_FOR_POST":
+      return { ...state, loadedCommentsForPost: { ...state.loadedCommentsForPost, [action.postId]: action.value } };
+    case "SET_LOADING_CHILDREN_FOR_COMMENT":
+      return { ...state, loadingChildrenForComment: { ...state.loadingChildrenForComment, [action.commentId]: action.value } };
+    case "SET_LOADED_CHILDREN_FOR_COMMENT":
+      return { ...state, loadedChildrenForComment: { ...state.loadedChildrenForComment, [action.commentId]: action.value } };
+
     default:
       return state;
   }
@@ -79,9 +168,25 @@ type MainContentContextType = {
   getPostWithUser: (id: number) => { post: PostGetI; user: UserGetI } | undefined;
   getUserById: (id: string) => UserGetI | undefined;
 
+  // Comments
+  getAllCommentsFromPost: (postId: number) => Promise<CommentGetI[]>;
+  getCommentChildren: (commentId: number) => Promise<CommentGetI[]>;
+  createCommentOnPost: (args: { content: string; post_id: number; comment_id: number | null }) => Promise<{
+    success: boolean;
+    message: string | undefined;
+    error: string | undefined;
+    trace: string | null;
+  }>;
+  getCommentsForPost: (postId: number) => CommentGetI[];
+  getChildrenForComment: (commentId: number) => CommentGetI[];
+  
   // Flags
   loaded: State["loaded"];
   loading: State["loading"];
+  loadingCommentsForPost: State["loadingCommentsForPost"];
+  loadedCommentsForPost: State["loadedCommentsForPost"];
+  loadingChildrenForComment: State["loadingChildrenForComment"];
+  loadedChildrenForComment: State["loadedChildrenForComment"];
 };
 
 const PostsContext = createContext<MainContentContextType | undefined>(undefined);
@@ -93,6 +198,9 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
   const inflightUserById = useRef<Map<string, Promise<UserGetI | null>>>(new Map());
   const inflightAllPosts = useRef<Promise<PostGetI[]> | null>(null);
   const inflightAllUsers = useRef<Promise<UserGetI[]> | null>(null);
+
+  const inflightCommentsByPostId = useRef<Map<number, Promise<CommentGetI[]>>>(new Map());
+  const inflightChildrenByCommentId = useRef<Map<number, Promise<CommentGetI[]>>>(new Map());
 
   // ---------- Users ----------
   const fetchUserById = useCallback(
@@ -149,9 +257,13 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
       );
       if (missing.length === 0) return;
       await Promise.all(missing.map((id) => fetchUserById(id)));
-    },
-    [state.usersById, fetchUserById]
-  );
+    }, [state.usersById, fetchUserById]);
+
+  const ensureUsersForComments = useCallback(async (comments: CommentGetI[]) => {
+    const missing = Array.from(new Set(comments.map((c) => c.user_id))).filter((uid) => !state.usersById[uid]);
+    if (missing.length === 0) return;
+    await Promise.all(missing.map((id) => fetchUserById(id)));
+  }, [state.usersById, fetchUserById]);
 
 
   // ---------- Posts ----------
@@ -234,6 +346,90 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     [fetchUserById]
   );
 
+  // ---------- Comments ----------
+  const getAllCommentsFromPost = useCallback(async (postId: number): Promise<CommentGetI[]> => {
+    if (state.loadedCommentsForPost[postId]) {
+      const rootIds = state.commentsByPostId[postId] ?? [];
+      return rootIds.map((id) => state.commentsById[id]).filter(Boolean);
+    }
+
+    const running = inflightCommentsByPostId.current.get(postId);
+    if (running) return running;
+
+    dispatch({ type: "SET_LOADING_COMMENTS_FOR_POST", postId, value: true });
+
+    const p = (async () => {
+      const res = await handleGetAllComentsFromPost(postId);
+      const comments = res.data ?? [];
+      if (comments.length) {
+        dispatch({ type: "UPSERT_COMMENTS_FOR_POST", postId, comments });
+        await ensureUsersForComments(comments);
+      }
+      dispatch({ type: "SET_LOADED_COMMENTS_FOR_POST", postId, value: true });
+      dispatch({ type: "SET_LOADING_COMMENTS_FOR_POST", postId, value: false });
+      return comments.filter((c) => c.is_child_of == null);
+    })();
+
+    inflightCommentsByPostId.current.set(postId, p);
+    try {
+      return await p;
+    } finally {
+      inflightCommentsByPostId.current.delete(postId);
+    }
+  }, [
+    state.loadedCommentsForPost,
+    state.commentsByPostId,
+    state.commentsById,
+    ensureUsersForComments,
+  ]);
+
+  const getCommentChildren = useCallback(async (commentId: number): Promise<CommentGetI[]> => {
+    if (state.loadedChildrenForComment[commentId]) {
+      const ids = state.commentsChildrenById[commentId] ?? [];
+      return ids.map((id) => state.commentsById[id]).filter(Boolean);
+    }
+
+    const running = inflightChildrenByCommentId.current.get(commentId);
+    if (running) return running;
+
+    dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: true });
+
+    const p = (async () => {
+      const res = await handleGetAllComentsChildren(commentId);
+      const children = res.data ?? [];
+      if (children.length) {
+        dispatch({ type: "UPSERT_CHILDREN_FOR_COMMENT", commentId, children });
+        await ensureUsersForComments(children);
+      }
+      dispatch({ type: "SET_LOADED_CHILDREN_FOR_COMMENT", commentId, value: true });
+      dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: false });
+      return children;
+    })();
+
+    inflightChildrenByCommentId.current.set(commentId, p);
+    try {
+      return await p;
+    } finally {
+      inflightChildrenByCommentId.current.delete(commentId);
+    }
+  }, [
+    state.loadedChildrenForComment,
+    state.commentsChildrenById,
+    state.commentsById,
+    ensureUsersForComments,
+  ]);
+
+  const createCommentOnPost = useCallback(async (args: { content: string; post_id: number; comment_id: number | null }) => {
+    const res = await handleCreateCommentOnPost(args.content, args.post_id, args.comment_id);
+    if (res.data) {
+      const c = res.data as CommentGetI;
+      dispatch({ type: "UPSERT_COMMENT", comment: c });
+      await fetchUserById(c.user_id);
+    }
+    return { success: res.success, message: res.message, error: res.error, trace: res.trace };
+  }, [fetchUserById]);
+
+  // ---------- Boot ----------
   useEffect(() => {
     (async () => {
       await fetchAllUsers();
@@ -241,22 +437,30 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     })();
   }, [fetchAllUsers, getAllPosts]);
 
-
   // ---------- Selectors ----------
   const posts = Object.values(state.postsById).sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
   const getUserById = useCallback((id: string) => state.usersById[id], [state.usersById]);
-  const getPostWithUser = useCallback(
-    (id: number) => {
-      const post = state.postsById[id];
-      if (!post) return undefined;
-      const user = state.usersById[post.user_id];
-      if (!user) return undefined;
-      return { post, user };
-    },
-    [state.postsById, state.usersById]
-  );
+  const getPostWithUser = useCallback((id: number) => {
+    const post = state.postsById[id];
+    if (!post) return undefined;
+    const user = state.usersById[post.user_id];
+    if (!user) return undefined;
+    return { post, user };
+  }, [state.postsById, state.usersById]);
+
+  const getCommentsForPost = useCallback((postId: number): CommentGetI[] => {
+    const ids = state.commentsByPostId[postId] ?? [];
+    const arr = ids.map((id) => state.commentsById[id]).filter(Boolean) as CommentGetI[];
+    return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [state.commentsByPostId, state.commentsById]);
+
+  const getChildrenForComment = useCallback((commentId: number): CommentGetI[] => {
+    const ids = state.commentsChildrenById[commentId] ?? [];
+    const arr = ids.map((id) => state.commentsById[id]).filter(Boolean) as CommentGetI[];
+    return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [state.commentsChildrenById, state.commentsById]);
   
   const value: MainContentContextType = {
     getAllPosts,
@@ -265,8 +469,22 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     posts,
     getPostWithUser,
     getUserById,
+
+    // comments
+    getAllCommentsFromPost,
+    getCommentChildren,
+    createCommentOnPost,
+    getCommentsForPost,
+    getChildrenForComment,
+
+
+    // Flags
     loaded: state.loaded,
     loading: state.loading,
+    loadingCommentsForPost: state.loadingCommentsForPost,
+    loadedCommentsForPost: state.loadedCommentsForPost,
+    loadingChildrenForComment: state.loadingChildrenForComment,
+    loadedChildrenForComment: state.loadedChildrenForComment,
   };
 
   return <PostsContext.Provider value={value}>{children}</PostsContext.Provider>;
