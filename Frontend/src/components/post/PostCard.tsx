@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useMainContent } from "@/providers/MainContentProvider";
 import type { PostGetI } from "@/types/post-interfaces";
 import { MessageSquare, Share2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 
 interface PostI {
@@ -19,10 +20,12 @@ export default function PostCard(props: PostI) {
 
   if(!user) return;
   return (
-    <div className={cn(
-      "w-full h-56 rounded-md px-5 py-2.5 cursor-pointer duration-500",
-      "border-2 shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] border-primary/50 hover:border-primary hover:scale-[102%]"
-    )}>
+    <Link href={`/posts/${props.data.id}`} 
+      className={cn(
+          "w-full h-56 rounded-md px-5 py-2.5 cursor-pointer duration-500",
+          "border-2 shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] border-primary/50 hover:border-primary hover:scale-[102%]"
+        )}
+    >
       {/* Details */}
       <div className={cn(
         "flex flex-col w-full h-full gap-3 flex-1"
@@ -45,6 +48,6 @@ export default function PostCard(props: PostI) {
           <Share2 />
         </div>
       </div>
-    </div>
+    </Link>
   )
 }

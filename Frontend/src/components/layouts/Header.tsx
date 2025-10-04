@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/providers/AuthProvider";
 import { clearAuthTokens } from "@/lib/cookies";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function Header() {
   const { openForm } = useModal();
@@ -24,10 +25,10 @@ export function Header() {
   }
   return (
     <header className="fixed z-10 top-0 left-0 w-full flex items-center justify-between py-2 px-6 bg-background border-b-2 border-border">
-      <div className="flex items-center gap-3 text-primary">
+      <Link className="flex items-center gap-3 text-primary" href="/">
         <BotMessageSquare size={48} />
         <span className="font-bold text-2xl">SiConn</span>
-      </div>
+      </Link>
       <div className="flex items-center gap-3">
         <InputWithIcon icon={<Search size={24}/>} className="min-w-64" placeholder="Pesquisar..."/>
         <FilterDropdownMenu />
