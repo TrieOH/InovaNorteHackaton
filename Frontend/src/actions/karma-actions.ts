@@ -1,3 +1,5 @@
+"use server";
+
 import { translateMessage } from "@/lib/client/i18n/enToPt";
 import { getAuthTokens } from "@/lib/cookies";
 import { api } from "@/lib/httpClient/api";
