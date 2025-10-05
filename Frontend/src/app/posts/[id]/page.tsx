@@ -7,7 +7,7 @@ type Props = {
 export default async function PostIDPage(props: Props) {
   const { id } = await props.params;
   return (
-    <section className="flex justify-center mt-5">
+    <section className="flex justify-center mt-5 min-h-screen">
       <PostDetails id={id}/>
     </section>
   )
