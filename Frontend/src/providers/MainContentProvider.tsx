@@ -194,7 +194,7 @@ type MainContentContextType = {
 
   // Comments
   getAllCommentsFromPost: (postId: number, opts?: { force?: boolean }) => Promise<CommentGetI[]>;
-  getCommentChildren: (commentId: number) => Promise<CommentGetI[]>;
+  // getCommentChildren: (commentId: number) => Promise<CommentGetI[]>;
   createCommentOnPost: (args: { content: string; post_id: number; comment_id: number | null }) => Promise<{
     success: boolean;
     message: string | undefined;
@@ -415,41 +415,41 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     ensureUsersForComments,
   ]);
 
-  const getCommentChildren = useCallback(async (commentId: number): Promise<CommentGetI[]> => {
-    if (state.loadedChildrenForComment[commentId]) {
-      const ids = state.commentsChildrenById[commentId] ?? [];
-      return ids.map((id) => state.commentsById[id]).filter(Boolean);
-    }
+  // const getCommentChildren = useCallback(async (commentId: number): Promise<CommentGetI[]> => {
+  //   if (state.loadedChildrenForComment[commentId]) {
+  //     const ids = state.commentsChildrenById[commentId] ?? [];
+  //     return ids.map((id) => state.commentsById[id]).filter(Boolean);
+  //   }
 
-    const running = inflightChildrenByCommentId.current.get(commentId);
-    if (running) return running;
+  //   const running = inflightChildrenByCommentId.current.get(commentId);
+  //   if (running) return running;
 
-    dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: true });
+  //   dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: true });
 
-    const p = (async () => {
-      const res = await handleGetAllComentsChildren(commentId);
-      const children = res.data ?? [];
-      if (children.length) {
-        dispatch({ type: "UPSERT_CHILDREN_FOR_COMMENT", commentId, children });
-        await ensureUsersForComments(children);
-      }
-      dispatch({ type: "SET_LOADED_CHILDREN_FOR_COMMENT", commentId, value: true });
-      dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: false });
-      return children;
-    })();
+  //   const p = (async () => {
+  //     const res = await handleGetAllComentsChildren(commentId);
+  //     const children = res.data ?? [];
+  //     if (children.length) {
+  //       dispatch({ type: "UPSERT_CHILDREN_FOR_COMMENT", commentId, children });
+  //       await ensureUsersForComments(children);
+  //     }
+  //     dispatch({ type: "SET_LOADED_CHILDREN_FOR_COMMENT", commentId, value: true });
+  //     dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: false });
+  //     return children;
+  //   })();
 
-    inflightChildrenByCommentId.current.set(commentId, p);
-    try {
-      return await p;
-    } finally {
-      inflightChildrenByCommentId.current.delete(commentId);
-    }
-  }, [
-    state.loadedChildrenForComment,
-    state.commentsChildrenById,
-    state.commentsById,
-    ensureUsersForComments,
-  ]);
+  //   inflightChildrenByCommentId.current.set(commentId, p);
+  //   try {
+  //     return await p;
+  //   } finally {
+  //     inflightChildrenByCommentId.current.delete(commentId);
+  //   }
+  // }, [
+  //   state.loadedChildrenForComment,
+  //   state.commentsChildrenById,
+  //   state.commentsById,
+  //   ensureUsersForComments,
+  // ]);
 
   const createCommentOnPost = useCallback(async (args: { content: string; post_id: number; comment_id: number | null }) => {
     const res = await handleCreateCommentOnPost(args.content, args.post_id, args.comment_id);
@@ -515,7 +515,7 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
   const getCommentsForPost = useCallback((postId: number): CommentGetI[] => {
     const ids = state.commentsByPostId[postId] ?? [];
     const arr = ids.map((id) => state.commentsById[id]).filter(Boolean) as CommentGetI[];
-    return arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    return arr;
   }, [state.commentsByPostId, state.commentsById]);
 
   const getChildrenForComment = useCallback((commentId: number): CommentGetI[] => {
@@ -534,7 +534,7 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
 
     // comments
     getAllCommentsFromPost,
-    getCommentChildren,
+    // getCommentChildren,
     createCommentOnPost,
     getCommentsForPost,
     getChildrenForComment,

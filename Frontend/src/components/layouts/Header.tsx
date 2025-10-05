@@ -86,8 +86,8 @@ export function Header() {
 
         {/* Mobile Button */}
         { isMobileMenuOpen ?
-          <X className="md:hidden flex" size={32} onClick={() => setIsMobileMenuOpen(false)} /> 
-          : <Menu className="md:hidden flex" size={32} onClick={() => setIsMobileMenuOpen(true)} /> 
+          <X className="md:hidden flex cursor-pointer" size={32} onClick={() => setIsMobileMenuOpen(false)} /> 
+          : <Menu className="md:hidden flex cursor-pointer" size={32} onClick={() => setIsMobileMenuOpen(true)} /> 
         }
       </div>
       {/* Mobile */}
