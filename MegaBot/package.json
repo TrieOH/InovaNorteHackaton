@@ -1,0 +1,25 @@
+{
+  "name": "megabot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Bot created to SiConn from Inova Norte Hackaton 2025",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --env-file=.env .",
+    "commands": "node --env-file=.env deploy-commands.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.18.0",
+  "dependencies": {
+    "discord.js": "^14.22.1",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.37.0",
+    "eslint": "^9.37.0"
+  }
+}
