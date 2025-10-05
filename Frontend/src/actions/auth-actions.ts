@@ -60,7 +60,7 @@ export async function handleGetAllUsers() {
 }
 
 export async function handleGetUserByID(id: string) {
-  const res = await api.get<UserGetI>(`/users:${id}`, 
+  const res = await api.get<UserGetI>(`/users/${id}`, 
     {
       src: {fn: "Get User By ID", route: "authActions"},
       next: { tags: ["users", `user:${id}`], revalidate: 300 },

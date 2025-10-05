@@ -27,7 +27,7 @@ ORDER BY created_at DESC;
 SELECT id, post_id, user_id, is_child_of, content, is_answer, created_at, updated_at
 FROM comments
 WHERE post_id = $1
-ORDER BY created_at ASC;
+ORDER BY created_at DESC;
 
 -- name: ListChildComments :many
 SELECT id, post_id, user_id, is_child_of, content, is_answer, created_at, updated_at

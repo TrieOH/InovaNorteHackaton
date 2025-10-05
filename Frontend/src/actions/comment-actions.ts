@@ -3,8 +3,7 @@ import { translateMessage } from "@/lib/client/i18n/enToPt";
 import { getAuthTokens } from "@/lib/cookies";
 import { api } from "@/lib/httpClient/api";
 import type { CommentCreationDataI } from "@/schemas/post-schema";
-import { CommentGetI } from "@/types/post-interfaces";
-import { revalidateTag } from "next/cache";
+import type { CommentGetI } from "@/types/post-interfaces";
 
 // If comment_id is null the comment is from the post
 export async function handleCreateCommentOnPost(content: string, post_id: number, comment_id: number | null) {
@@ -18,8 +17,7 @@ export async function handleCreateCommentOnPost(content: string, post_id: number
     }, 
     { src: {fn: "Create Post Comment", route: "commentActions"} }
   );
-  if(res.ok) revalidateTag("comments");
-  console.log(res)
+  // console.log(res)
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),
@@ -32,12 +30,9 @@ export async function handleCreateCommentOnPost(content: string, post_id: number
 // From post and comments, including the children comments
 export async function handleGetAllComentsFromPost(post_id: number) {
   const res = await api.get<CommentGetI[]>(`/posts/${post_id}/comments`,
-    { 
-      src: {fn: "Get All Comments From Post", route: "commentActions"},
-      next: { tags: ["comments"], revalidate: 60 },
-    }
+    { src: {fn: "Get All Comments From Post", route: "commentActions"} }
   );
-  console.log(res)
+  // console.log(res)
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),
@@ -50,12 +45,9 @@ export async function handleGetAllComentsFromPost(post_id: number) {
 // Get all comments children these children are comment too, not include the child childrens
 export async function handleGetAllComentsChildren(comment_id: number) {
   const res = await api.get<CommentGetI[]>(`/comments/${comment_id}/children`,
-    { 
-      src: {fn: "Get All Comments", route: "commentActions"},
-      next: { tags: ["comments", `comment:${comment_id}`], revalidate: 60 },
-    }
+    { src: {fn: "Get All Comments", route: "commentActions"} }
   );
-  console.log(res)
+  // console.log(res)
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),
