@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
-import { createForumPost } from "./services/forumService.js";
+import { createForumPost, getPostsFromDb } from "./services/forumService.js";
 
 const app = e();
 const port = process.env.PORT;
@@ -60,6 +60,14 @@ client.login(token);
 app.get("/", (req, res) => {
   res.send("MegaBot foi criado de fato!");
 });
+
+app.get("/get-posts", async (req, res) => {
+  const posts = await getPostsFromDb();
+  // for (const post of posts) {
+  //   await createForumPost(client, post);
+  // }
+  res.send(posts)
+})
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
