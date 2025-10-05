@@ -73,7 +73,7 @@ export default function PostCard(props: PostI) {
         />
       </div>
       {/* Details */}
-      <div className="flex flex-col w-full h-full gap-3 flex-1"> 
+      <div className="flex flex-col w-0 h-full gap-3 flex-1"> 
         <div>
           <h3 className="font-bold truncate">{props.data.title}</h3>
           <p className="max-w-[360px] text-sm flex flex-wrap items-center gap-1">

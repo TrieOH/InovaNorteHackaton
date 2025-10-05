@@ -59,7 +59,7 @@ export default function PostDetails(props: Props) {
   };
 
   return (
-    <div className="max-w-6xl mt-16 flex flex-col w-full justify-center items-center px-4 gap-4 mb-5">
+    <div className="max-w-6xl flex flex-col w-full justify-center items-center px-4 gap-4 mb-5">
       <div className="flex items-center w-full justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h3 className="font-bold break-words">
