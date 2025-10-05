@@ -1,6 +1,7 @@
 "use client";
 
 import { timeAgo } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 import { useMainContent } from "@/providers/MainContentProvider";
 import type { CommentGetI } from "@/types/post-interfaces";
 import { BadgeCheck, BadgeQuestionMark, ChevronDown, ChevronUp } from "lucide-react";
@@ -49,17 +50,28 @@ export default function PostComment(props: Props) {
             <span>•</span>
             <span>{timeAgo(props.comment.created_at)}</span>
           </p>
-          {props.has_permission && (!props.comment.is_answer ?
-            <BadgeQuestionMark 
-              onClick={() => toggleCommentAnswer(props.comment.id)}
+          {!props.comment.is_answer ? (
+            props.has_permission && (
+              <BadgeQuestionMark
+                onClick={() => toggleCommentAnswer(props.comment.id)}
+                size={32}
+                className="shrink-0 text-primary/80 hover:text-black cursor-pointer duration-200"
+              />
+            )
+          ) : (
+            <BadgeCheck
+              onClick={
+                props.has_permission
+                  ? () => toggleCommentAnswer(props.comment.id)
+                  : undefined
+              }
               size={32}
-              className="shrink-0 text-primary/80 hover:text-black cursor-pointer duration-200" 
-            />
-            :
-            <BadgeCheck 
-              onClick={() => toggleCommentAnswer(props.comment.id)}
-              size={32}
-              className="shrink-0 text-secondary/80 hover:text-black cursor-pointer duration-200" 
+              className={cn(
+                "shrink-0 duration-200",
+                props.has_permission
+                  ? "text-secondary/80 hover:text-black cursor-pointer"
+                  : "text-secondary/50 cursor-default"
+              )}
             />
           )}
         </div>

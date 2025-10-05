@@ -549,7 +549,8 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
   const getCommentsForPost = useCallback((postId: number): CommentGetI[] => {
     const ids = state.commentsByPostId[postId] ?? [];
     const arr = ids.map((id) => state.commentsById[id]).filter(Boolean) as CommentGetI[];
-    return arr;
+    // return arr;
+    return arr.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   }, [state.commentsByPostId, state.commentsById]);
 
   const getChildrenForComment = useCallback((commentId: number): CommentGetI[] => {
