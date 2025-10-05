@@ -1,6 +1,6 @@
 services:
   backend:
-    container_name: inova_service
+    container_name: inova_backend
     build:
       context: ./Backend
       dockerfile: Dockerfile
@@ -16,7 +16,7 @@ services:
       BOT_USER_ID: ${BOT_USER_ID}
 
   frontend:
-    container_name: frontend
+    container_name: inova_frontend
     build:
       context: ./Frontend
       dockerfile: Dockerfile
