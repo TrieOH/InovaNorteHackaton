@@ -4,9 +4,15 @@
 /* @custom-variant dark (&:is(.dark *)); */
 
 :root {
-  --primary: oklch(0.5404 0.2388 281.57);
+  /* --primary: oklch(0.5404 0.2388 281.57);
   --secondary: oklch(0.5697 0.2046 31.05);
-  --tertiary: oklch(0.6083 0.1694 140.79);
+  --tertiary: oklch(0.6083 0.1694 140.79); */
+
+  --primary: oklch(0.6427 0.1139 183.45);
+  --secondary: oklch(0.8251 0.1831 113.23);
+  --tertiary: oklch(0.7122 0.1778 132.22);
+
+
   --border: oklch(0.922 0 0);
   --background: oklch(1 0 0);
   --input: oklch(0.922 0 0);

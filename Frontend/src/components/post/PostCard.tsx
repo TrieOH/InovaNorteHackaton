@@ -5,7 +5,7 @@ import { useMainContent } from "@/providers/MainContentProvider";
 import type { PostGetI } from "@/types/post-interfaces";
 import { ChevronDown, ChevronUp, MessageSquare, Share2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { type MouseEvent, useEffect } from "react";
 import { toast } from "sonner";
 
 interface PostI {
@@ -32,7 +32,8 @@ export default function PostCard(props: PostI) {
   const comments = getCommentsForPost(props.data.id);
   const postKarma = selectPostKarma(props.data.id);
 
-  const handleShare = async () => {
+  const handleShare = async (e: MouseEvent<SVGSVGElement>) => {
+    e.preventDefault();
     try {
       const url = `${window.location.origin}/posts/${props.data.id}`;
       await navigator.clipboard.writeText(url);
