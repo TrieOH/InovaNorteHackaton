@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { PostGetI } from "@/types/post-interfaces";
 import { useMainContent } from "./MainContentProvider";
 
@@ -94,15 +94,39 @@ export function PostsBrowseProvider({
   const end = start + pageSize;
   const items = answeredFiltered.slice(start, end);
 
+  const visibleIds = useMemo(
+    () => items.map(p => p.id),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [order, safePage, pageSize]
+  );
+
+  const lastKeyRef = useRef<string>("");
+
   useEffect(() => {
-    if (!prefetch || items.length === 0) return;
+    if (!prefetch || visibleIds.length === 0) return;
+
+    const key = `${order}|${safePage}|${visibleIds.join(",")}`;
+    if (lastKeyRef.current === key) return;
+    lastKeyRef.current = key;
+
     if (order === "relevant") {
-      Promise.allSettled(items.map((p) => getPostKarma(p.id)));
+      Promise.allSettled(
+        visibleIds
+          .filter(id => selectPostKarma(id) == null)
+          .map(id => getPostKarma(id))
+      );
     }
+
     if (order === "answered") {
-      Promise.allSettled(items.map((p) => getAllCommentsFromPost(p.id)));
+      Promise.allSettled(
+        visibleIds
+          .filter(id => (getCommentsForPost(id)?.length ?? 0) === 0)
+          .map(id => getAllCommentsFromPost(id))
+      );
     }
-  }, [order, safePage, pageSize, items]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefetch, order, safePage, pageSize, visibleIds]);
 
   const value: Ctx = {
     items,

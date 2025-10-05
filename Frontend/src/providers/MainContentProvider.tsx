@@ -1,6 +1,6 @@
 "use client";
 import { handleGetAllUsers, handleGetUserByID } from "@/actions/auth-actions";
-import { handleCreateCommentOnPost, handleGetAllComentsChildren, handleGetAllComentsFromPost } from "@/actions/comment-actions";
+import { handleCreateCommentOnPost, handleGetAllComentsFromPost } from "@/actions/comment-actions";
 import { handleGetAllCommentVote, handleGetAllPostVote, handleVoteOnComment, handleVoteOnPost } from "@/actions/karma-actions";
 import { handleCreatePost, handleGetAllPosts, handleGetPostByID } from "@/actions/post-actions";
 import type { PostCreationDataI } from "@/schemas/post-schema";
@@ -232,7 +232,7 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
   const inflightAllUsers = useRef<Promise<UserGetI[]> | null>(null);
 
   const inflightCommentsByPostId = useRef<Map<number, Promise<CommentGetI[]>>>(new Map());
-  const inflightChildrenByCommentId = useRef<Map<number, Promise<CommentGetI[]>>>(new Map());
+  // const inflightChildrenByCommentId = useRef<Map<number, Promise<CommentGetI[]>>>(new Map());
 
   // ---------- Users ----------
   const fetchUserById = useCallback(
