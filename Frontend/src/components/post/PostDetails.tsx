@@ -2,13 +2,14 @@
 
 import { timeAgo } from "@/lib/date-utils";
 import { useMainContent } from "@/providers/MainContentProvider";
-import { MessageSquare, SendHorizonal, Share2 } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageSquare, SendHorizonal, Share2 } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "../ui/button";
 import { useModal } from "@/providers/ModalProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import PostComment from "./PostComment";
 
 type Props = {
   id: number;
@@ -17,14 +18,32 @@ type Props = {
 export default function PostDetails(props: Props) {
   const { openForm, postId } = useModal();
   const { is_logged_in } = useAuth();
-  const { getPostById, getAllCommentsFromPost, getCommentsForPost, getPostWithUser, getUserById } = useMainContent();
+  const { 
+    getPostById, 
+    getAllCommentsFromPost,
+    getCommentsForPost,
+    getPostWithUser,
+    getUserById,
+
+    getPostKarma,
+    selectPostKarma,
+    voteOnPost,
+  } = useMainContent();
 
   useEffect(() => {
     getPostById(props.id);
+  }, [props.id, getPostById]);
+  
+  useEffect(() => {
     getAllCommentsFromPost(props.id, { force: true });
-  }, [props.id, getPostById, getAllCommentsFromPost]);
+  }, [props.id, getAllCommentsFromPost]);
+
+  useEffect(() => {
+    getPostKarma(props.id);
+  }, [props.id, getPostKarma]);
 
   const postWUser = getPostWithUser(props.id);
+  const postKarma = selectPostKarma(props.id);
   const comments = getCommentsForPost(props.id);
 
   const handleShare = async () => {
@@ -62,7 +81,19 @@ export default function PostDetails(props: Props) {
         {postWUser?.post.content}
       </pre>
       <div className="flex w-full justify-between">
-        <p>dwdw</p>
+        <div className="flex flex-row items-center gap-1">
+          <ChevronUp
+            size={40} 
+            className="p-1 cursor-pointer hover:bg-primary/40 rounded-full duration-500 transition-colors"
+            onClick={() => voteOnPost(props.id, 1)}
+          />
+          <span className="font-medium text-lg">{postKarma}</span>
+          <ChevronDown 
+            size={40} 
+            className="p-1 cursor-pointer hover:bg-secondary/40 rounded-full duration-500 transition-colors"
+            onClick={() => voteOnPost(props.id, -1)}
+          />
+        </div>
         <div className="flex gap-1.5">
           <MessageSquare />
           <span>{comments.length}</span>
@@ -90,17 +121,7 @@ export default function PostDetails(props: Props) {
           const author = getUserById(c.user_id);
           return (
             <div key={c.id || i}>
-              <div className="border-l-4 border-primary px-3 rounded-sm py-2">
-                <p className="max-w-[360px] text-sm flex flex-wrap items-center gap-1 mb-4">
-                  <span>Postado por</span>
-                  <span className="font-semibold truncate max-w-[calc(250px-80px)]">{author?.username}</span>
-                  <span>•</span>
-                  <span>{timeAgo(c.created_at)}</span>
-                </p>
-                <pre className="font-thin min-h-24 text-sm overflow-clip flex-1 w-full text-wrap leading-none">
-                  {c.content}
-                </pre>
-              </div>
+              <PostComment key={c.id} author={author?.username ?? "Not Found"} comment={c}/>
 
               {i < comments.length - 1 && (
                 <div className="flex items-center w-full gap-4 px-4">

@@ -1,6 +1,7 @@
 "use client";
 import { handleGetAllUsers, handleGetUserByID } from "@/actions/auth-actions";
 import { handleCreateCommentOnPost, handleGetAllComentsChildren, handleGetAllComentsFromPost } from "@/actions/comment-actions";
+import { handleGetAllCommentVote, handleGetAllPostVote, handleVoteOnComment, handleVoteOnPost } from "@/actions/karma-actions";
 import { handleCreatePost, handleGetAllPosts, handleGetPostByID } from "@/actions/post-actions";
 import type { PostCreationDataI } from "@/schemas/post-schema";
 import type { CommentGetI, PostGetI } from "@/types/post-interfaces";
@@ -18,10 +19,14 @@ type State = {
   commentsById: Record<number, CommentGetI>;
   commentsByPostId: Record<number, number[]>;
   commentsChildrenById: Record<number, number[]>;
-    loadedCommentsForPost: Record<number, boolean>;
+  loadedCommentsForPost: Record<number, boolean>;
   loadingCommentsForPost: Record<number, boolean>;
   loadedChildrenForComment: Record<number, boolean>;
   loadingChildrenForComment: Record<number, boolean>;
+
+  // Karma
+  postKarmaById: Record<number, number>;
+  commentKarmaById: Record<number, number>;
 };
 
 const initialState: State = {
@@ -38,6 +43,9 @@ const initialState: State = {
   loadingCommentsForPost: {},
   loadedChildrenForComment: {},
   loadingChildrenForComment: {},
+
+  postKarmaById: {},
+  commentKarmaById: {},
 };
 
 type Action =
@@ -48,14 +56,19 @@ type Action =
   | { type: "SET_LOADING"; key: keyof State["loading"]; value: boolean }
   | { type: "SET_LOADED"; key: keyof State["loaded"]; value: boolean }
 
-    // Comments
+  // Comments
   | { type: "UPSERT_COMMENTS_FOR_POST"; postId: number; comments: CommentGetI[] }
   | { type: "UPSERT_CHILDREN_FOR_COMMENT"; commentId: number; children: CommentGetI[] }
   | { type: "UPSERT_COMMENT"; comment: CommentGetI }
   | { type: "SET_LOADING_COMMENTS_FOR_POST"; postId: number; value: boolean }
   | { type: "SET_LOADED_COMMENTS_FOR_POST"; postId: number; value: boolean }
   | { type: "SET_LOADING_CHILDREN_FOR_COMMENT"; commentId: number; value: boolean }
-  | { type: "SET_LOADED_CHILDREN_FOR_COMMENT"; commentId: number; value: boolean };
+  | { type: "SET_LOADED_CHILDREN_FOR_COMMENT"; commentId: number; value: boolean }
+
+  // Karma
+  | { type: "SET_POST_KARMA"; postId: number; karma: number }
+  | { type: "SET_COMMENT_KARMA"; commentId: number; karma: number };
+
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -90,7 +103,7 @@ function reducer(state: State, action: Action): State {
       return { ...state, loaded: { ...state.loaded, [action.key]: action.value } };
     
     // Comments
-        case "UPSERT_COMMENTS_FOR_POST": {
+    case "UPSERT_COMMENTS_FOR_POST": {
       const commentsById = { ...state.commentsById };
       const rootIds = new Set<number>(state.commentsByPostId[action.postId] ?? []);
       const childrenMap = { ...state.commentsChildrenById };
@@ -150,6 +163,17 @@ function reducer(state: State, action: Action): State {
     case "SET_LOADED_CHILDREN_FOR_COMMENT":
       return { ...state, loadedChildrenForComment: { ...state.loadedChildrenForComment, [action.commentId]: action.value } };
 
+    case "SET_POST_KARMA":
+      return {
+        ...state,
+        postKarmaById: { ...state.postKarmaById, [action.postId]: action.karma },
+      };
+    case "SET_COMMENT_KARMA":
+      return {
+        ...state,
+        commentKarmaById: { ...state.commentKarmaById, [action.commentId]: action.karma },
+      };
+
     default:
       return state;
   }
@@ -179,6 +203,14 @@ type MainContentContextType = {
   }>;
   getCommentsForPost: (postId: number) => CommentGetI[];
   getChildrenForComment: (commentId: number) => CommentGetI[];
+
+  // Karma
+  getPostKarma: (postId: number) => Promise<number>;
+  getCommentKarma: (commentId: number) => Promise<number>;
+  voteOnPost: (postId: number, vote?: 1 | -1) => Promise<{ success: boolean; message?: string; error?: string; trace: string | null }>;
+  voteOnComment: (commentId: number, vote?: 1 | -1) => Promise<{ success: boolean; message?: string; error?: string; trace: string | null }>;
+  selectPostKarma: (postId: number) => number;
+  selectCommentKarma: (commentId: number) => number;
   
   // Flags
   loaded: State["loaded"];
@@ -429,6 +461,36 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     return { success: res.success, message: res.message, error: res.error, trace: res.trace };
   }, [fetchUserById]);
 
+  // Karma
+  const getPostKarma = useCallback(async (postId: number): Promise<number> => {
+    const res = await handleGetAllPostVote(postId);
+    const karma = res.data ?? 0;
+    dispatch({ type: "SET_POST_KARMA", postId, karma });
+    return karma;
+  }, []);
+
+  const getCommentKarma = useCallback(async (commentId: number): Promise<number> => {
+    const res = await handleGetAllCommentVote(commentId);
+    const karma = res.data ?? 0;
+    dispatch({ type: "SET_COMMENT_KARMA", commentId, karma });
+    return karma;
+  }, []);
+
+  const voteOnPost = useCallback(async (postId: number, vote: 1 | -1 = 1) => {
+    const res = await handleVoteOnPost(postId, vote);
+    if (res.success) await getPostKarma(postId);
+    return res;
+  }, [getPostKarma]);
+
+  const voteOnComment = useCallback(async (commentId: number, vote: 1 | -1 = 1) => {
+    const res = await handleVoteOnComment(commentId, vote);
+    if (res.success) await getCommentKarma(commentId);
+    return res;
+  }, [getCommentKarma]);
+
+  const selectPostKarma = useCallback((postId: number) => state.postKarmaById[postId] ?? 0, [state.postKarmaById]);
+  const selectCommentKarma = useCallback((commentId: number) => state.commentKarmaById[commentId] ?? 0, [state.commentKarmaById]);
+
   // ---------- Boot ----------
   useEffect(() => {
     (async () => {
@@ -476,6 +538,14 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     createCommentOnPost,
     getCommentsForPost,
     getChildrenForComment,
+
+    // Karma
+    getPostKarma,
+    getCommentKarma,
+    voteOnPost,
+    voteOnComment,
+    selectPostKarma,
+    selectCommentKarma,
 
 
     // Flags
