@@ -47,15 +47,15 @@ export default function PostDetails(props: Props) {
     getPostKarma(props.id);
   }, [props.id, getPostKarma]);
 
+  const postWUser = getPostWithUser(props.id);
+  const postKarma = selectPostKarma(props.id);
+  const comments = getCommentsForPost(props.id);
+
   useEffect(() => {
     (async () => {
       setHasPermission(await isTheSameUser(postWUser?.post.user_id ?? ""))
     })();
-  }, []);
-
-  const postWUser = getPostWithUser(props.id);
-  const postKarma = selectPostKarma(props.id);
-  const comments = getCommentsForPost(props.id);
+  }, [postWUser?.post.user_id]);
 
   const handleShare = async () => {
     try {
