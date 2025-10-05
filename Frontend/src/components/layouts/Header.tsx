@@ -12,9 +12,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { usePostsBrowseContext } from "@/providers/PostsBrowserProvider";
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { q, setQ } = usePostsBrowseContext();
   const { openForm } = useModal();
   const { is_logged_in } = useAuth();
   const router = useRouter();
@@ -40,7 +42,13 @@ export function Header() {
 
         {/* Desktop */}
         <div className="items-center gap-3 md:flex hidden">
-          <InputWithIcon icon={<Search size={24}/>} className="lg:w-64 w-48" placeholder="Pesquisar..."/>
+          <InputWithIcon
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            icon={<Search size={24}/>}
+            className="lg:w-64 w-48"
+            placeholder="Pesquisar..."
+          />
           <FilterDropdownMenu />
         </div>
 
@@ -97,7 +105,12 @@ export function Header() {
         !isMobileMenuOpen && "hidden",
       )}>
         <div className="flex items-center gap-3">
-          <InputWithIcon icon={<Search size={24}/>} placeholder="Pesquisar..."/>
+          <InputWithIcon 
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            icon={<Search size={24}/>} 
+            placeholder="Pesquisar..."
+          />
           <FilterDropdownMenu />
         </div>
         {/* It's not ideal, but for now it's okay..... */}

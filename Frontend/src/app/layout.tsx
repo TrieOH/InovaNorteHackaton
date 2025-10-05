@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { getAuthTokens } from "@/lib/cookies";
 import { MainContentProvider } from "@/providers/MainContentProvider";
+import { PostsBrowseProvider } from "@/providers/PostsBrowserProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -30,10 +31,12 @@ export default async function RootLayout({
       <body className={`${inter.variable} antialiased font-inter`}>
         <AuthProvider is_logged_in={is_logged_in}>
           <MainContentProvider>
-            <ModalProvider>
-              <Header />
-              {children}
-            </ModalProvider>
+            <PostsBrowseProvider pageSize={12}>
+              <ModalProvider>
+                <Header />
+                {children}
+              </ModalProvider>
+            </PostsBrowseProvider>
           </MainContentProvider>
         </AuthProvider>
         <Toaster />

@@ -14,7 +14,7 @@ export async function handleVoteOnPost(post_id: number, vote: number = 1) {
     }, 
     { src: {fn: "Vote On Post", route: "voteActions"} }
   );
-  console.log(res)
+  // console.log(res)
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),
@@ -27,7 +27,7 @@ export async function handleGetAllPostVote(post_id: number) {
   const res = await api.get<number>(`/posts/${post_id}/karma`,
     { src: {fn: "Get All Post Votes", route: "commentActions"} }
   );
-  console.log(res)
+  // console.log(res)
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),
@@ -47,7 +47,7 @@ export async function handleVoteOnComment(comment_id: number, vote: number = 1) 
     }, 
     { src: {fn: "Vote On Comment", route: "voteActions"} }
   );
-  console.log(res)
+  // console.log(res)
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),
@@ -60,7 +60,7 @@ export async function handleGetAllCommentVote(comment_id: number) {
   const res = await api.get<number>(`/comments/${comment_id}/karma`,
     { src: {fn: "Get All Comments Votes", route: "commentActions"} }
   );
-  console.log(res)
+  // console.log(res)
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),
