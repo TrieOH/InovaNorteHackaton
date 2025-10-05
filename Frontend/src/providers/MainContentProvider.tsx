@@ -169,7 +169,7 @@ type MainContentContextType = {
   getUserById: (id: string) => UserGetI | undefined;
 
   // Comments
-  getAllCommentsFromPost: (postId: number) => Promise<CommentGetI[]>;
+  getAllCommentsFromPost: (postId: number, opts?: { force?: boolean }) => Promise<CommentGetI[]>;
   getCommentChildren: (commentId: number) => Promise<CommentGetI[]>;
   createCommentOnPost: (args: { content: string; post_id: number; comment_id: number | null }) => Promise<{
     success: boolean;
@@ -347,8 +347,8 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
   );
 
   // ---------- Comments ----------
-  const getAllCommentsFromPost = useCallback(async (postId: number): Promise<CommentGetI[]> => {
-    if (state.loadedCommentsForPost[postId]) {
+  const getAllCommentsFromPost = useCallback(async (postId: number, opts?: { force?: boolean }): Promise<CommentGetI[]> => {
+    if (!!!opts?.force && state.loadedCommentsForPost[postId]) {
       const rootIds = state.commentsByPostId[postId] ?? [];
       return rootIds.map((id) => state.commentsById[id]).filter(Boolean);
     }

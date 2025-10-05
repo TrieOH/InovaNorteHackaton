@@ -14,7 +14,7 @@ export async function handleCreatePost(data: PostCreationDataI) {
     { src: {fn: "Create Post", route: "postActions"} }
   );
   if(res.ok) revalidateTag("posts");
-  // console.log(res)
+  // console.log(res);
   return {
     success: res.ok,
     message: translateMessage(res.body?.message),

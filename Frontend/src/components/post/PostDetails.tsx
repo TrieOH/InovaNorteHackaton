@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { useModal } from "@/providers/ModalProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type Props = {
   id: number;
@@ -18,26 +19,48 @@ export default function PostDetails(props: Props) {
   const { is_logged_in } = useAuth();
   const { getPostById, getAllCommentsFromPost, getCommentsForPost, getPostWithUser, getUserById } = useMainContent();
 
-  useEffect(() => { getPostById(props.id); }, [props.id, getPostById]);
-  useEffect(() => { getAllCommentsFromPost(props.id); }, [props.id, getAllCommentsFromPost]);
+  useEffect(() => {
+    getPostById(props.id);
+    getAllCommentsFromPost(props.id, { force: true });
+  }, [props.id, getPostById, getAllCommentsFromPost]);
+
   const postWUser = getPostWithUser(props.id);
   const comments = getCommentsForPost(props.id);
 
+  const handleShare = async () => {
+    try {
+      const url = `${window.location.origin}/posts/${props.id}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copiado com sucesso!");
+    } catch (err) {
+      toast.error("Falha ao copiar o link!");
+    }
+  };
+
   return (
     <div className="max-w-6xl mt-16 flex flex-col w-full justify-center items-center px-4 gap-4 mb-5">
-      <div className="flex items-center w-full justify-between">
-        <div>
-          <h3 className="font-bold">{postWUser?.post.title}</h3>
+      <div className="flex items-center w-full justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold break-words">
+            {postWUser?.post.title}
+          </h3>
           <p className="max-w-[360px] text-sm flex flex-wrap items-center gap-1">
             <span>Postado por</span>
-            <span className="font-semibold truncate max-w-[calc(250px-80px)]">{postWUser?.user.username}</span>
+            <span className="font-semibold truncate max-w-[calc(250px-80px)]">
+              {postWUser?.user.username}
+            </span>
             <span>•</span>
             <span>{timeAgo(postWUser?.post.created_at ?? "")}</span>
           </p>
         </div>
-        <Share2 />
+        <Share2 
+          onClick={handleShare} 
+          className="shrink-0 text-gray-500 hover:text-black cursor-pointer duration-200" 
+        />
       </div>
-      <pre className="font-normal min-h-24 text-sm overflow-clip flex-1 w-full">{postWUser?.post.content}</pre>
+      <pre className="font-normal min-h-24 text-sm overflow-clip flex-1 w-full text-wrap leading-none">
+        {postWUser?.post.content}
+      </pre>
       <div className="flex w-full justify-between">
         <p>dwdw</p>
         <div className="flex gap-1.5">
@@ -67,14 +90,16 @@ export default function PostDetails(props: Props) {
           const author = getUserById(c.user_id);
           return (
             <div key={c.id || i}>
-              <div className="border-l-4 border-primary px-3 rounded-sm">
-                <p className="max-w-[360px] text-sm flex flex-wrap items-center gap-1 mb-2">
+              <div className="border-l-4 border-primary px-3 rounded-sm py-2">
+                <p className="max-w-[360px] text-sm flex flex-wrap items-center gap-1 mb-4">
                   <span>Postado por</span>
                   <span className="font-semibold truncate max-w-[calc(250px-80px)]">{author?.username}</span>
                   <span>•</span>
                   <span>{timeAgo(c.created_at)}</span>
                 </p>
-                <pre className="font-thin min-h-24 text-sm overflow-clip flex-1 w-full">{c.content}</pre>
+                <pre className="font-thin min-h-24 text-sm overflow-clip flex-1 w-full text-wrap leading-none">
+                  {c.content}
+                </pre>
               </div>
 
               {i < comments.length - 1 && (

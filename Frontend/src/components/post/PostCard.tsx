@@ -6,6 +6,7 @@ import type { PostGetI } from "@/types/post-interfaces";
 import { MessageSquare, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 interface PostI {
   data: PostGetI
@@ -17,6 +18,16 @@ export default function PostCard(props: PostI) {
 
   useEffect(() => { getAllCommentsFromPost(props.data.id); }, [props.data.id, getAllCommentsFromPost]);
   const comments = getCommentsForPost(props.data.id);
+
+  const handleShare = async () => {
+    try {
+      const url = `${window.location.origin}/posts/${props.data.id}`;
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copiado com sucesso!");
+    } catch (err) {
+      toast.error("Falha ao copiar o link!");
+    }
+  };
 
   if(!user) return;
   return (
@@ -31,7 +42,7 @@ export default function PostCard(props: PostI) {
         "flex flex-col w-full h-full gap-3 flex-1"
       )}> 
         <div>
-          <h3 className="font-bold">{props.data.title}</h3>
+          <h3 className="font-bold truncate">{props.data.title}</h3>
           <p className="max-w-[360px] text-sm flex flex-wrap items-center gap-1">
             <span>Postado por</span>
             <span className="font-semibold truncate max-w-[calc(250px-80px)]">{user.username}</span>
@@ -39,13 +50,18 @@ export default function PostCard(props: PostI) {
             <span>{timeAgo(props.data.created_at)}</span>
           </p>
         </div>
-        <pre className="font-light max-h-24 overflow-clip flex-1">{props.data.content}</pre>
+        <pre className="font-light max-h-24 overflow-clip flex-1 text-wrap leading-none">
+          {props.data.content}
+        </pre>
         <div className="flex w-full items-center justify-between">
           <div className="flex gap-1.5">
             <MessageSquare />
             <span>{comments.length}</span>
           </div>
-          <Share2 />
+          <Share2 
+            onClick={handleShare} 
+            className="shrink-0 text-gray-500 hover:text-black cursor-pointer duration-200" 
+          />
         </div>
       </div>
     </Link>
