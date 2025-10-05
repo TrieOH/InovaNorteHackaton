@@ -23,7 +23,6 @@ export default function PostCard(props: PostI) {
     voteOnPost,
   } = useMainContent();
   const user = getUserById(props.data.user_id);
-  if(!user) return;
 
   useEffect(() => { getAllCommentsFromPost(props.data.id); }, [props.data.id, getAllCommentsFromPost]);
   useEffect(() => {
@@ -38,10 +37,12 @@ export default function PostCard(props: PostI) {
       const url = `${window.location.origin}/posts/${props.data.id}`;
       await navigator.clipboard.writeText(url);
       toast.success("Link copiado com sucesso!");
-    } catch (err) {
+    } catch {
       toast.error("Falha ao copiar o link!");
     }
   };
+
+  if(!user) return;
 
   return (
     <Link href={`/posts/${props.data.id}`} 

@@ -3,7 +3,7 @@ import { translateMessage } from "@/lib/client/i18n/enToPt";
 import { getAuthTokens } from "@/lib/cookies";
 import { api } from "@/lib/httpClient/api";
 import type { CommentCreationDataI } from "@/schemas/post-schema";
-import { CommentGetI } from "@/types/post-interfaces";
+import type { CommentGetI } from "@/types/post-interfaces";
 
 // If comment_id is null the comment is from the post
 export async function handleCreateCommentOnPost(content: string, post_id: number, comment_id: number | null) {

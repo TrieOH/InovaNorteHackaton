@@ -32,11 +32,13 @@ export default function PostDetails(props: Props) {
 
   useEffect(() => {
     getPostById(props.id);
-  }, [props.id, getPostById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.id]);
   
   useEffect(() => {
     getAllCommentsFromPost(props.id, { force: true });
-  }, [props.id, getAllCommentsFromPost]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.id]);
 
   useEffect(() => {
     getPostKarma(props.id);
@@ -51,7 +53,7 @@ export default function PostDetails(props: Props) {
       const url = `${window.location.origin}/posts/${props.id}`;
       await navigator.clipboard.writeText(url);
       toast.success("Link copiado com sucesso!");
-    } catch (err) {
+    } catch {
       toast.error("Falha ao copiar o link!");
     }
   };
