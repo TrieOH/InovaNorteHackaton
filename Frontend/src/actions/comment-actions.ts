@@ -56,3 +56,24 @@ export async function handleGetAllComentsChildren(comment_id: number) {
     data: res.body?.ok ? res.body?.data : null
   }
 }
+
+// If used to mark response, change data.is_answer
+export async function handleUpdatePostComment(data: CommentGetI) {
+  const res = await api.patch<CommentGetI, { user_id: string, is_answer: boolean, content: string  }>
+  (`/posts/${data.post_id}/comments/${data.id}`, 
+    {
+      content: data.content,
+      user_id: data.user_id,
+      is_answer: data.is_answer,
+    }, 
+    { src: {fn: "Update Post Comment", route: "commentActions"} }
+  );
+  console.log(res)
+  return {
+    success: res.ok,
+    message: translateMessage(res.body?.message),
+    error: translateMessage(res.error),
+    trace: !res.body?.ok ? (res.body?.trace || []).map(translateMessage).join("\n") : null,
+    data: res.body?.ok ? res.body?.data : null
+  }
+}

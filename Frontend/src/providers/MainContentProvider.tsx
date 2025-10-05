@@ -1,8 +1,9 @@
 "use client";
 import { handleGetAllUsers, handleGetUserByID } from "@/actions/auth-actions";
-import { handleCreateCommentOnPost, handleGetAllComentsFromPost } from "@/actions/comment-actions";
+import { handleCreateCommentOnPost, handleGetAllComentsFromPost, handleUpdatePostComment } from "@/actions/comment-actions";
 import { handleGetAllCommentVote, handleGetAllPostVote, handleVoteOnComment, handleVoteOnPost } from "@/actions/karma-actions";
 import { handleCreatePost, handleGetAllPosts, handleGetPostByID } from "@/actions/post-actions";
+import { isTheSameUser } from "@/lib/cookies";
 import type { PostCreationDataI } from "@/schemas/post-schema";
 import type { CommentGetI, PostGetI } from "@/types/post-interfaces";
 import type { UserGetI } from "@/types/user-interfaces";
@@ -194,11 +195,19 @@ type MainContentContextType = {
 
   // Comments
   getAllCommentsFromPost: (postId: number, opts?: { force?: boolean }) => Promise<CommentGetI[]>;
-  // getCommentChildren: (commentId: number) => Promise<CommentGetI[]>;
   createCommentOnPost: (args: { content: string; post_id: number; comment_id: number | null }) => Promise<{
     success: boolean;
     message: string | undefined;
     error: string | undefined;
+    trace: string | null;
+  }>;
+  toggleCommentAnswer: (
+    commentId: number,
+    opts?: { exclusive?: boolean }
+  ) => Promise<{
+    success: boolean;
+    message?: string;
+    error?: string;
     trace: string | null;
   }>;
   getCommentsForPost: (postId: number) => CommentGetI[];
@@ -232,7 +241,6 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
   const inflightAllUsers = useRef<Promise<UserGetI[]> | null>(null);
 
   const inflightCommentsByPostId = useRef<Map<number, Promise<CommentGetI[]>>>(new Map());
-  // const inflightChildrenByCommentId = useRef<Map<number, Promise<CommentGetI[]>>>(new Map());
 
   // ---------- Users ----------
   const fetchUserById = useCallback(
@@ -415,42 +423,6 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     ensureUsersForComments,
   ]);
 
-  // const getCommentChildren = useCallback(async (commentId: number): Promise<CommentGetI[]> => {
-  //   if (state.loadedChildrenForComment[commentId]) {
-  //     const ids = state.commentsChildrenById[commentId] ?? [];
-  //     return ids.map((id) => state.commentsById[id]).filter(Boolean);
-  //   }
-
-  //   const running = inflightChildrenByCommentId.current.get(commentId);
-  //   if (running) return running;
-
-  //   dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: true });
-
-  //   const p = (async () => {
-  //     const res = await handleGetAllComentsChildren(commentId);
-  //     const children = res.data ?? [];
-  //     if (children.length) {
-  //       dispatch({ type: "UPSERT_CHILDREN_FOR_COMMENT", commentId, children });
-  //       await ensureUsersForComments(children);
-  //     }
-  //     dispatch({ type: "SET_LOADED_CHILDREN_FOR_COMMENT", commentId, value: true });
-  //     dispatch({ type: "SET_LOADING_CHILDREN_FOR_COMMENT", commentId, value: false });
-  //     return children;
-  //   })();
-
-  //   inflightChildrenByCommentId.current.set(commentId, p);
-  //   try {
-  //     return await p;
-  //   } finally {
-  //     inflightChildrenByCommentId.current.delete(commentId);
-  //   }
-  // }, [
-  //   state.loadedChildrenForComment,
-  //   state.commentsChildrenById,
-  //   state.commentsById,
-  //   ensureUsersForComments,
-  // ]);
-
   const createCommentOnPost = useCallback(async (args: { content: string; post_id: number; comment_id: number | null }) => {
     const res = await handleCreateCommentOnPost(args.content, args.post_id, args.comment_id);
     if (res.data) {
@@ -460,6 +432,68 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
     }
     return { success: res.success, message: res.message, error: res.error, trace: res.trace };
   }, [fetchUserById]);
+
+  const setCommentAnswer = useCallback(
+    async (commentId: number, isAnswer: boolean, opts?: { exclusive?: boolean }) => {
+      const c = state.commentsById[commentId];
+      if (!c) return { success: false, message: undefined, error: "Comentário não carregado", trace: null };
+
+      const post = state.postsById[c.post_id];
+      if (!post) {
+        return { success: false, message: undefined, error: "Post não carregado", trace: null };
+      }
+
+      const sameUser = await isTheSameUser(post.user_id);
+      if (!sameUser) {
+        return {
+          success: false,
+          message: undefined,
+          error: "Somente o autor do post pode marcar uma resposta.",
+          trace: null,
+        };
+      }
+
+      const prevIsAnswer = c.is_answer;
+      const postId = c.post_id;
+
+      dispatch({ type: "UPSERT_COMMENT", comment: { ...c, is_answer: isAnswer } });
+
+      // If exclusive, remove 'is_answer' of all others comments
+      let changedOthers: CommentGetI[] = [];
+      if (opts?.exclusive && isAnswer) {
+        changedOthers = Object.values(state.commentsById)
+          .filter((x) => x.post_id === postId && x.id !== c.id && x.is_answer)
+          .map((x) => ({ ...x, is_answer: false }));
+
+        for (const other of changedOthers) dispatch({ type: "UPSERT_COMMENT", comment: other });
+      }
+
+      const res = await handleUpdatePostComment({ ...c, is_answer: isAnswer });
+
+      if (!res.success) {
+        // rollback
+        dispatch({ type: "UPSERT_COMMENT", comment: { ...c, is_answer: prevIsAnswer } });
+        if (opts?.exclusive && isAnswer && changedOthers.length) {
+          for (const other of changedOthers) {
+            dispatch({ type: "UPSERT_COMMENT", comment: { ...other, is_answer: true } });
+          }
+        }
+        await getAllCommentsFromPost(postId, { force: true });
+      }
+      return res;
+    },
+    [state.commentsById, state.postsById, getAllCommentsFromPost]
+  );
+
+  
+  const toggleCommentAnswer = useCallback(
+    async (commentId: number, opts?: { exclusive?: boolean }) => {
+      const c = state.commentsById[commentId];
+      if (!c) return { success: false, message: undefined, error: "Comentário não carregado", trace: null };
+      return setCommentAnswer(commentId, !c.is_answer, opts);
+    },
+    [state.commentsById, setCommentAnswer]
+  );
 
   // Karma
   const getPostKarma = useCallback(async (postId: number): Promise<number> => {
@@ -534,10 +568,11 @@ export function MainContentProvider({ children }: { children: ReactNode }) {
 
     // comments
     getAllCommentsFromPost,
-    // getCommentChildren,
     createCommentOnPost,
     getCommentsForPost,
     getChildrenForComment,
+    toggleCommentAnswer,
+    
 
     // Karma
     getPostKarma,

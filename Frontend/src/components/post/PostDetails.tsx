@@ -3,19 +3,22 @@
 import { timeAgo } from "@/lib/date-utils";
 import { useMainContent } from "@/providers/MainContentProvider";
 import { ChevronDown, ChevronUp, MessageSquare, SendHorizonal, Share2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { useModal } from "@/providers/ModalProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import PostComment from "./PostComment";
+import { isTheSameUser } from "@/lib/cookies";
 
 type Props = {
   id: number;
 }
 
 export default function PostDetails(props: Props) {
+  const [hasPermission, setHasPermission] = useState(false);
+  
   const { openForm, postId } = useModal();
   const { is_logged_in } = useAuth();
   const { 
@@ -43,6 +46,12 @@ export default function PostDetails(props: Props) {
   useEffect(() => {
     getPostKarma(props.id);
   }, [props.id, getPostKarma]);
+
+  useEffect(() => {
+    (async () => {
+      setHasPermission(await isTheSameUser(postWUser?.post.user_id ?? ""))
+    })();
+  }, []);
 
   const postWUser = getPostWithUser(props.id);
   const postKarma = selectPostKarma(props.id);
@@ -123,7 +132,11 @@ export default function PostDetails(props: Props) {
           const author = getUserById(c.user_id);
           return (
             <div key={c.id || i}>
-              <PostComment key={c.id} author={author?.username ?? "Not Found"} comment={c}/>
+              <PostComment 
+                key={c.id} 
+                author={author?.username ?? "Not Found"} 
+                comment={c} has_permission={is_logged_in && hasPermission}
+              />
 
               {i < comments.length - 1 && (
                 <div className="flex items-center w-full gap-4 px-4">
